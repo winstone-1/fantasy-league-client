@@ -6,12 +6,14 @@ import Search from './pages/Search'
 import Standings from './pages/Standings'
 import NotFound from './pages/NotFound'
 import ProtectedRoute from './components/ProtectedRoute'
+import League from './pages/League'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/"          element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/leagues"   element={<ProtectedRoute><League /></ProtectedRoute>} />
         <Route path="/login"     element={<Login />} />
         <Route path="/register"  element={<Register />} />
         <Route path="/search"    element={<ProtectedRoute><Search /></ProtectedRoute>} />

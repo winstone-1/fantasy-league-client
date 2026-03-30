@@ -10,21 +10,15 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const googleUser = localStorage.getItem('googleUser')
-    if (googleUser) {
-      setUser(JSON.parse(googleUser))
-      setLoading(false)
-      return
-    }
-    if (token) {
-      api.get('/auth/me')
-        .then(res => setUser(res.data))
-        .catch(() => logout())
-        .finally(() => setLoading(false))
-    } else {
-      setLoading(false)
-    }
-  }, [token])
+  if (token) {
+    api.get('/auth/me')
+      .then(res => setUser(res.data))
+      .catch(() => logout())
+      .finally(() => setLoading(false))
+  } else {
+    setLoading(false)
+  }
+}, [token])
 
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password })
@@ -48,11 +42,13 @@ export function AuthProvider({ children }) {
 
   const res = await api.post('/auth/google', {
     email:    firebaseUser.email,
-    username: firebaseUser.displayName.replace(/\s+/g, '').toLowerCase(),
+    username: firebaseUser.displayName?.replace(/\s+/g, '').toLowerCase(),
     photo:    firebaseUser.photoURL
   })
 
+  // use MongoDB user, not Firebase user
   localStorage.setItem('token', res.data.token)
+  localStorage.removeItem('googleUser')
   setToken(res.data.token)
   setUser(res.data)
   return res.data
