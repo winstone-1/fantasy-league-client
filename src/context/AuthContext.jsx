@@ -43,20 +43,20 @@ export function AuthProvider({ children }) {
   }
 
   const loginWithGoogle = async () => {
-    const result = await signInWithPopup(auth, provider)
-    const firebaseUser = result.user
-    const googleUser = {
-      _id:      firebaseUser.uid,
-      username: firebaseUser.displayName,
-      email:    firebaseUser.email,
-      photo:    firebaseUser.photoURL,
-      role:     'member',
-      isGoogle: true
-    }
-    localStorage.setItem('googleUser', JSON.stringify(googleUser))
-    setUser(googleUser)
-    return googleUser
-  }
+  const result = await signInWithPopup(auth, provider)
+  const firebaseUser = result.user
+
+  const res = await api.post('/auth/google', {
+    email:    firebaseUser.email,
+    username: firebaseUser.displayName.replace(/\s+/g, '').toLowerCase(),
+    photo:    firebaseUser.photoURL
+  })
+
+  localStorage.setItem('token', res.data.token)
+  setToken(res.data.token)
+  setUser(res.data)
+  return res.data
+}
 
   const logout = () => {
     localStorage.removeItem('token')
