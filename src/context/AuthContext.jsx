@@ -10,6 +10,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    const googleUser = localStorage.getItem('googleUser')
+    if (googleUser) {
+      setUser(JSON.parse(googleUser))
+      setLoading(false)
+      return
+    }
     if (token) {
       api.get('/auth/me')
         .then(res => setUser(res.data))
@@ -27,16 +33,6 @@ export function AuthProvider({ children }) {
     setUser(res.data)
     return res.data
   }
-  
-  const loginWithGoogle = async () => {
-  const result = await signInWithPopup(auth, provider)
-  const idToken = await result.user.getIdToken()
-  const res = await api.post('/auth/google', { idToken })
-  localStorage.setItem('token', res.data.token)
-  setToken(res.data.token)
-  setUser(res.data)
-  return res.data
-}
 
   const register = async (username, email, password) => {
     const res = await api.post('/auth/register', { username, email, password })
@@ -46,17 +42,33 @@ export function AuthProvider({ children }) {
     return res.data
   }
 
+  const loginWithGoogle = async () => {
+    const result = await signInWithPopup(auth, provider)
+    const firebaseUser = result.user
+    const googleUser = {
+      _id:      firebaseUser.uid,
+      username: firebaseUser.displayName,
+      email:    firebaseUser.email,
+      photo:    firebaseUser.photoURL,
+      role:     'member',
+      isGoogle: true
+    }
+    localStorage.setItem('googleUser', JSON.stringify(googleUser))
+    setUser(googleUser)
+    return googleUser
+  }
+
   const logout = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('googleUser')
     setToken(null)
     setUser(null)
   }
 
   return (
-   <AuthContext.Provider value={{ user, token, loading, login, register, logout, loginWithGoogle }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
-
   )
 }
 
