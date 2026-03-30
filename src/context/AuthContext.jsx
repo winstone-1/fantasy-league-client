@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import api from '../api/axios'
+import { auth, provider, signInWithPopup } from '../firebase'
 
 const AuthContext = createContext()
 
@@ -26,6 +27,16 @@ export function AuthProvider({ children }) {
     setUser(res.data)
     return res.data
   }
+  
+  const loginWithGoogle = async () => {
+  const result = await signInWithPopup(auth, provider)
+  const idToken = await result.user.getIdToken()
+  const res = await api.post('/auth/google', { idToken })
+  localStorage.setItem('token', res.data.token)
+  setToken(res.data.token)
+  setUser(res.data)
+  return res.data
+}
 
   const register = async (username, email, password) => {
     const res = await api.post('/auth/register', { username, email, password })
@@ -42,9 +53,10 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+   <AuthContext.Provider value={{ user, token, loading, login, register, logout, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
+
   )
 }
 
