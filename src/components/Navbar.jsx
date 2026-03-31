@@ -7,11 +7,12 @@ function Navbar() {
   const { user, logout } = useAuth()
 
   const links = [
-    { label: 'Dashboard', path: '/' },
-    { label: 'My Leagues', path: '/leagues' },
-    { label: 'Players', path: '/search' },
-    { label: 'Standings', path: '/standings' },
-  ]
+  { label: 'Dashboard', path: '/' },
+  { label: 'My Leagues', path: '/leagues' },
+  { label: 'My Team', path: '/teams' },
+  { label: 'Players', path: '/search' },
+  { label: 'Standings', path: '/standings' },
+]
 
   const handleLogout = () => {
     logout()
