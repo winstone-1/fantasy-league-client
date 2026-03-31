@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import Navbar from '../components/Navbar'
 import api from '../api/axios'
 
 function Search() {
@@ -9,8 +11,34 @@ function Search() {
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState('')
   const [searched, setSearched] = useState(false)
+  const [myTeams, setMyTeams]   = useState([])
+  const [adding, setAdding]     = useState(null)
+  const [showPicker, setShowPicker] = useState(null)
+  const [successMsg, setSuccessMsg] = useState('')
 
+  const { user } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => { fetchMyTeams() }, [])
+
+  const fetchMyTeams = async () => {
+    try {
+      const leaguesRes = await api.get('/leagues')
+      const teams = []
+      for (const league of leaguesRes.data) {
+        const teamsRes = await api.get(`/leagues/${league._id}/teams`)
+        const myTeam = teamsRes.data.find(t =>
+          t.owner?._id === user?._id || t.owner?.email === user?.email
+        )
+        if (myTeam) {
+          teams.push({ ...myTeam, leagueId: league._id, leagueName: league.name, sport: league.sport })
+        }
+      }
+      setMyTeams(teams)
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   const handleSearch = async (e) => {
     e.preventDefault()
@@ -28,61 +56,68 @@ function Search() {
     }
   }
 
+  const handleAddToTeam = async (player, team) => {
+    setAdding(player._id)
+    try {
+      await api.post(`/leagues/${team.leagueId}/teams/${team._id}/players`, {
+        playerId: player._id
+      })
+      setSuccessMsg(`${player.name} added to ${team.name}!`)
+      setTimeout(() => setSuccessMsg(''), 3000)
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to add player')
+      setTimeout(() => setError(''), 3000)
+    } finally {
+      setAdding(null)
+      setShowPicker(null)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-
-      {/* Navbar */}
-      <nav className="flex items-center justify-between px-8 py-4 border-b border-gray-800">
-        <div className="flex items-center gap-2">
-          <span className="text-green-400 text-2xl">🏆</span>
-          <span className="text-green-400 font-bold text-xl">FantasySports</span>
-        </div>
-        <div className="flex items-center gap-6 text-sm text-gray-400">
-          <button onClick={() => navigate('/')} className="hover:text-white transition">Dashboard</button>
-          <button className="text-white font-medium bg-gray-800 px-4 py-2 rounded-lg">Players</button>
-          <button onClick={() => navigate('/standings')} className="hover:text-white transition">Standings</button>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="max-w-5xl mx-auto px-8 py-8">
 
-        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">Player Search</h1>
+          <h1 className="text-3xl font-bold">Player Search</h1>
           <p className="text-gray-400 mt-1">Find real NBA and EPL players for your fantasy team</p>
         </div>
+
+        {/* Success toast */}
+        {successMsg && (
+          <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded-xl mb-4 text-sm flex items-center gap-2">
+            <span>✓</span> {successMsg}
+          </div>
+        )}
+
+        {/* Error toast */}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl mb-4 text-sm">
+            {error}
+          </div>
+        )}
 
         {/* Search bar */}
         <form onSubmit={handleSearch} className="mb-8">
           <div className="flex flex-col sm:flex-row gap-3">
-
-            {/* Sport toggle */}
             <div className="flex gap-2 bg-gray-900 p-1 rounded-xl border border-gray-800">
               <button
                 type="button"
                 onClick={() => setSport('basketball')}
                 className={`px-5 py-2 rounded-lg text-sm font-medium transition ${
-                  sport === 'basketball'
-                    ? 'bg-green-500 text-gray-950'
-                    : 'text-gray-400 hover:text-white'
+                  sport === 'basketball' ? 'bg-green-500 text-gray-950' : 'text-gray-400 hover:text-white'
                 }`}
-              >
-                🏀 NBA
-              </button>
+              >🏀 NBA</button>
               <button
                 type="button"
                 onClick={() => setSport('soccer')}
                 className={`px-5 py-2 rounded-lg text-sm font-medium transition ${
-                  sport === 'soccer'
-                    ? 'bg-green-500 text-gray-950'
-                    : 'text-gray-400 hover:text-white'
+                  sport === 'soccer' ? 'bg-green-500 text-gray-950' : 'text-gray-400 hover:text-white'
                 }`}
-              >
-                ⚽ EPL
-              </button>
+              >⚽ EPL</button>
             </div>
 
-            {/* Input */}
             <div className="flex flex-1 gap-3">
               <input
                 type="text"
@@ -102,14 +137,7 @@ function Search() {
           </div>
         </form>
 
-        {/* Error */}
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm">
-            {error}
-          </div>
-        )}
-
-        {/* Loading */}
+        {/* Loading skeletons */}
         {loading && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
@@ -134,27 +162,23 @@ function Search() {
         {/* Default state */}
         {!loading && !searched && (
           <div className="text-center py-20">
-            <div className="text-5xl mb-4">
-              {sport === 'basketball' ? '🏀' : '⚽'}
-            </div>
+            <div className="text-5xl mb-4">{sport === 'basketball' ? '🏀' : '⚽'}</div>
             <p className="text-gray-400 text-lg">Search for your favourite players</p>
             <p className="text-gray-600 text-sm mt-1">
-              {sport === 'basketball' ? 'Try searching LeBron, Curry, Durant...' : 'Try searching Salah, Haaland, De Bruyne...'}
+              {sport === 'basketball' ? 'Try LeBron, Curry, Durant...' : 'Try Salah, Haaland, De Bruyne...'}
             </p>
           </div>
         )}
 
-        {/* Results */}
+        {/* Results grid */}
         {!loading && players.length > 0 && (
           <>
-            <p className="text-gray-400 text-sm mb-4">
-              {players.length} player{players.length !== 1 ? 's' : ''} found
-            </p>
+            <p className="text-gray-400 text-sm mb-4">{players.length} player{players.length !== 1 ? 's' : ''} found</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {players.map(player => (
                 <div
                   key={player._id}
-                  className="bg-gray-900 border border-gray-800 rounded-2xl p-5 hover:border-green-500 transition cursor-pointer group"
+                  className="bg-gray-900 border border-gray-800 rounded-2xl p-5 hover:border-green-500 transition group"
                 >
                   {/* Photo */}
                   <div className="relative mx-auto w-16 h-16 mb-3">
@@ -163,19 +187,15 @@ function Search() {
                         src={player.photo}
                         alt={player.name}
                         className="w-16 h-16 rounded-full object-cover border-2 border-gray-700 group-hover:border-green-500 transition"
-                        onError={e => {
-                          e.target.style.display = 'none'
-                          e.target.nextSibling.style.display = 'flex'
-                        }}
+                        onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }}
                       />
                     ) : null}
                     <div
-                      className="w-16 h-16 rounded-full bg-gray-800 border-2 border-gray-700 group-hover:border-green-500 transition items-center justify-center text-2xl"
+                      className="w-16 h-16 rounded-full bg-gray-800 border-2 border-gray-700 items-center justify-center text-2xl"
                       style={{ display: player.photo ? 'none' : 'flex' }}
                     >
                       {sport === 'basketball' ? '🏀' : '⚽'}
                     </div>
-                    {/* Sport badge */}
                     <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gray-950 flex items-center justify-center text-xs">
                       {sport === 'basketball' ? '🏀' : '⚽'}
                     </div>
@@ -191,18 +211,44 @@ function Search() {
                           {player.position}
                         </span>
                       )}
-                      {player.nationality && (
-                        <span className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">
-                          {player.nationality}
-                        </span>
-                      )}
                     </div>
                   </div>
 
                   {/* Add to team button */}
-                  <button className="w-full mt-3 py-1.5 rounded-lg bg-gray-800 hover:bg-green-500 hover:text-gray-950 text-gray-400 text-xs font-medium transition">
-                    + Add to Team
-                  </button>
+                  {myTeams.length > 0 ? (
+                    <div className="relative mt-3">
+                      <button
+                        onClick={() => setShowPicker(showPicker === player._id ? null : player._id)}
+                        disabled={adding === player._id}
+                        className="w-full py-1.5 rounded-lg bg-gray-800 hover:bg-green-500 hover:text-gray-950 text-gray-300 text-xs font-medium transition disabled:opacity-50"
+                      >
+                        {adding === player._id ? 'Adding...' : '+ Add to Team'}
+                      </button>
+
+                      {/* Team picker dropdown */}
+                      {showPicker === player._id && (
+                        <div className="absolute bottom-full left-0 right-0 mb-1 bg-gray-800 border border-gray-700 rounded-xl overflow-hidden z-10">
+                          {myTeams.map(team => (
+                            <button
+                              key={team._id}
+                              onClick={() => handleAddToTeam(player, team)}
+                              className="w-full text-left px-3 py-2 text-xs hover:bg-gray-700 transition border-b border-gray-700 last:border-0"
+                            >
+                              <p className="text-white font-medium">{team.name}</p>
+                              <p className="text-gray-400">{team.leagueName} · {team.sport}</p>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => navigate('/leagues')}
+                      className="w-full mt-3 py-1.5 rounded-lg bg-gray-800 text-gray-500 text-xs transition hover:text-gray-300"
+                    >
+                      Create a team first
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
