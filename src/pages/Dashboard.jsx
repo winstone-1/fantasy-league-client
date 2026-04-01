@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import api from '../api/axios'
+import Footer from '../components/Footer'
 
 function Dashboard() {
   const { user } = useAuth()
@@ -57,6 +58,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
+      
 
       <div className="max-w-5xl mx-auto px-8 py-8">
 
@@ -215,6 +217,7 @@ function Dashboard() {
           </>
         )}
       </div>
+      <Footer />
     </div>
   )
 }

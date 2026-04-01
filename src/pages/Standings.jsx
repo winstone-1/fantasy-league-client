@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -316,6 +317,7 @@ function Standings() {
         )}
 
       </div>
+      <Footer />
     </div>
   )
 }

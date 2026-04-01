@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import api from '../api/axios'
 
+
 function Search() {
   const [query, setQuery]       = useState('')
   const [sport, setSport]       = useState('basketball')
@@ -255,6 +256,7 @@ function Search() {
           </>
         )}
       </div>
+      
     </div>
   )
 }
