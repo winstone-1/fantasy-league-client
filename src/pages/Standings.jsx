@@ -1,94 +1,186 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+const getRankBadge = (rank) => {
+  if (rank === 1) return { bg: 'bg-yellow-500',  label: '🥇' }
+  if (rank === 2) return { bg: 'bg-gray-400',    label: '🥈' }
+  if (rank === 3) return { bg: 'bg-amber-600',   label: '🥉' }
+  return           { bg: 'bg-gray-700',           label: rank  }
+}
+
+/**
+ * Trend arrow based on rank movement.
+ * previousRank is stored in localStorage per league between sessions.
+ * Lower rank number = better position, so if currentRank < prev → moved UP.
+ */
+const getTrend = (currentRank, previousRank) => {
+  if (previousRank == null || previousRank === currentRank)
+    return { icon: '—', color: 'text-gray-600' }
+  if (currentRank < previousRank)
+    return { icon: '↑', color: 'text-green-400' }
+  return { icon: '↓', color: 'text-red-400' }
+}
+
+/**
+ * Derive W-L-D and weeklyPoints from standings data.
+ * The backend standing entry may already have wins/losses/weeklyPoints.
+ * If not, we fall back to sensible placeholders so the columns still render.
+ */
+const enrichEntry = (entry, idx, allEntries) => {
+  const wins        = entry.wins         ?? entry.w         ?? 0
+  const losses      = entry.losses       ?? entry.l         ?? 0
+  const draws       = entry.draws        ?? entry.d         ?? 0
+  const weeklyPoints = entry.weeklyPoints ?? entry.gw        ?? null
+  return { ...entry, wins, losses, draws, weeklyPoints }
+}
+
+// ─── Skeleton row ───────────────────────────────────────────────────────────
+
+const SkeletonRow = () => (
+  <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 animate-pulse">
+    <div className="flex items-center gap-4">
+      <div className="w-9 h-9 rounded-full bg-gray-800" />
+      <div className="flex-1 space-y-2">
+        <div className="h-4 bg-gray-800 rounded w-1/3" />
+        <div className="h-3 bg-gray-800 rounded w-1/4" />
+      </div>
+      <div className="h-5 bg-gray-800 rounded w-20" />
+      <div className="h-5 bg-gray-800 rounded w-14" />
+      <div className="h-5 bg-gray-800 rounded w-16" />
+    </div>
+  </div>
+)
+
+// ─── Main component ─────────────────────────────────────────────────────────
+
 function Standings() {
+  const [leagues,   setLeagues]   = useState([])
+  const [league,    setLeague]    = useState(null)
   const [standings, setStandings] = useState([])
-  const [league, setLeague]       = useState(null)
-  const [loading, setLoading]     = useState(true)
-  const [error, setError]         = useState('')
+  const [prevRanks, setPrevRanks] = useState({})   // { teamId: rank }
+  const [loading,   setLoading]   = useState(true)
+  const [switching, setSwitching] = useState(false) // lightweight spinner on switch
+  const [error,     setError]     = useState('')
 
   const { user } = useAuth()
   const navigate = useNavigate()
 
+  // ── Fetch all leagues once on mount ─────────────────────────────────────
   useEffect(() => {
-    const fetchStandings = async () => {
+    const init = async () => {
       try {
-        const leaguesRes = await api.get('/leagues')
-        if (leaguesRes.data.length === 0) {
-          setLoading(false)
-          return
-        }
-        const firstLeague = leaguesRes.data[0]
-        setLeague(firstLeague)
-        const standingsRes = await api.get(`/leagues/${firstLeague._id}/standings`)
-        setStandings(standingsRes.data.standings || [])
-      } catch (err) {
-        setError('Failed to load standings')
-      } finally {
+        const res = await api.get('/leagues')
+        if (res.data.length === 0) { setLoading(false); return }
+        setLeagues(res.data)
+        setLeague(res.data[0])
+      } catch {
+        setError('Failed to load leagues')
         setLoading(false)
       }
     }
-    fetchStandings()
+    init()
   }, [])
 
-  const getRankBadge = (rank) => {
-    if (rank === 1) return { bg: 'bg-yellow-500', text: '🥇' }
-    if (rank === 2) return { bg: 'bg-gray-400', text: '🥈' }
-    if (rank === 3) return { bg: 'bg-amber-600', text: '🥉' }
-    return { bg: 'bg-gray-700', text: rank }
+  // ── Fetch standings whenever selected league changes ─────────────────────
+  const fetchStandings = useCallback(async (selectedLeague) => {
+    if (!selectedLeague) return
+    try {
+      const res = await api.get(`/leagues/${selectedLeague._id}/standings`)
+      const raw = res.data.standings || []
+
+      // Load previous ranks from localStorage for trend arrows
+      const storageKey = `standings_prev_${selectedLeague._id}`
+      const stored = JSON.parse(localStorage.getItem(storageKey) || '{}')
+      setPrevRanks(stored)
+
+      // Save current ranks as "previous" for next visit
+      const currentRanks = {}
+      raw.forEach(e => { currentRanks[e.teamId] = e.rank })
+      localStorage.setItem(storageKey, JSON.stringify(currentRanks))
+
+      setStandings(raw.map((e, i, arr) => enrichEntry(e, i, arr)))
+      setError('')
+    } catch {
+      setError('Failed to load standings')
+    }
+  }, [])
+
+  // Run on first league load
+  useEffect(() => {
+    if (!league) return
+    const run = async () => {
+      await fetchStandings(league)
+      setLoading(false)
+    }
+    run()
+  }, [league, fetchStandings])
+
+  // ── League switcher handler ──────────────────────────────────────────────
+  const handleLeagueSwitch = async (leagueId) => {
+    const selected = leagues.find(l => l._id === leagueId)
+    if (!selected || selected._id === league?._id) return
+    setSwitching(true)
+    setStandings([])
+    setLeague(selected)
+    await fetchStandings(selected)
+    setSwitching(false)
   }
 
+  // ─── Render ──────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-8 py-8">
+      <div className="max-w-5xl mx-auto px-6 py-8">
 
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        {/* ── Header ── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold">League Standings</h1>
+            <h1 className="text-3xl font-bold tracking-tight">League Standings</h1>
             {league && (
-              <p className="text-gray-400 mt-1">{league.name} · {league.sport} · Season {league.season}</p>
+              <p className="text-gray-400 mt-1 text-sm">
+                {league.name} · {league.sport} · Season {league.season ?? '—'}
+              </p>
             )}
           </div>
-          {league && (
-            <span className="text-xs bg-green-500/10 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-full">
-              {league.sport === 'soccer' ? '⚽ EPL' : '🏀 NBA'}
-            </span>
-          )}
+
+          <div className="flex items-center gap-3">
+            {/* Sport badge */}
+            {league && (
+              <span className="text-xs bg-green-500/10 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-full shrink-0">
+                {league.sport === 'soccer' ? '⚽ EPL' : '🏀 NBA'}
+              </span>
+            )}
+
+            {/* League switcher — only shown when user is in 2+ leagues */}
+            {leagues.length > 1 && (
+              <select
+                value={league?._id ?? ''}
+                onChange={e => handleLeagueSwitch(e.target.value)}
+                className="bg-gray-900 border border-gray-700 text-white text-sm rounded-xl px-3 py-2
+                           focus:outline-none focus:border-green-500 transition cursor-pointer"
+              >
+                {leagues.map(l => (
+                  <option key={l._id} value={l._id}>{l.name}</option>
+                ))}
+              </select>
+            )}
+          </div>
         </div>
 
-        {/* Loading */}
-        {loading && (
-          <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 animate-pulse">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gray-800"/>
-                  <div className="flex-1">
-                    <div className="h-4 bg-gray-800 rounded w-1/3 mb-2"/>
-                    <div className="h-3 bg-gray-800 rounded w-1/4"/>
-                  </div>
-                  <div className="h-6 bg-gray-800 rounded w-16"/>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Error */}
+        {/* ── Error ── */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm">
             {error}
           </div>
         )}
 
-        {/* No league */}
+        {/* ── Empty state ── */}
         {!loading && !league && (
           <div className="text-center py-20">
             <div className="text-5xl mb-4">📊</div>
@@ -102,54 +194,67 @@ function Standings() {
           </div>
         )}
 
-        {/* Table header */}
-        {!loading && standings.length > 0 && (
+        {/* ── Loading skeleton ── */}
+        {(loading || switching) && (
+          <div className="space-y-3">
+            {[...Array(5)].map((_, i) => <SkeletonRow key={i} />)}
+          </div>
+        )}
+
+        {/* ── Table ── */}
+        {!loading && !switching && standings.length > 0 && (
           <>
-            <div className="grid grid-cols-6 text-xs text-gray-500 uppercase tracking-wider px-5 mb-2">
+            {/* Column headers */}
+            <div className="grid grid-cols-12 text-xs text-gray-500 uppercase tracking-wider px-5 mb-2">
               <span className="col-span-1">Rank</span>
-              <span className="col-span-2">Team</span>
-              <span className="col-span-1 text-center">Players</span>
-              <span className="col-span-1 text-center">Points</span>
-              <span className="col-span-1 text-right">Owner</span>
+              <span className="col-span-3">Team</span>
+              <span className="col-span-2 text-center">Record</span>
+              <span className="col-span-2 text-center">This GW</span>
+              <span className="col-span-2 text-center">Total Pts</span>
+              <span className="col-span-2 text-right">Owner</span>
             </div>
 
-            {/* Standings rows */}
+            {/* Rows */}
             <div className="space-y-3">
               {standings.map((entry) => {
-                const badge = getRankBadge(entry.rank)
-                const isMe = entry.owner?._id === user?._id || entry.owner?.email === user?.email
+                const badge  = getRankBadge(entry.rank)
+                const trend  = getTrend(entry.rank, prevRanks[entry.teamId])
+                const isMe   = entry.owner?._id === user?._id || entry.owner?.email === user?.email
 
                 return (
                   <div
                     key={entry.teamId}
-                    className={`relative bg-gray-900 border rounded-2xl p-5 transition ${
+                    className={`relative bg-gray-900 border rounded-2xl p-5 transition-all duration-200 ${
                       isMe
                         ? 'border-green-500 bg-green-500/5'
                         : 'border-gray-800 hover:border-gray-600'
                     }`}
                   >
-                    {/* Your team indicator */}
+                    {/* Your-team left accent bar */}
                     {isMe && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-green-500 rounded-r-full"/>
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-green-500 rounded-r-full" />
                     )}
 
-                    <div className="grid grid-cols-6 items-center">
+                    <div className="grid grid-cols-12 items-center gap-1">
 
-                      {/* Rank */}
-                      <div className="col-span-1 flex items-center">
-                        <div className={`w-9 h-9 rounded-full ${badge.bg} flex items-center justify-center text-sm font-bold text-white`}>
-                          {typeof badge.text === 'number' ? badge.text : badge.text}
+                      {/* Rank + trend */}
+                      <div className="col-span-1 flex items-center gap-1.5">
+                        <div className={`w-9 h-9 rounded-full ${badge.bg} flex items-center justify-center text-sm font-bold text-white shrink-0`}>
+                          {badge.label}
                         </div>
+                        <span className={`text-base font-bold leading-none ${trend.color}`}>
+                          {trend.icon}
+                        </span>
                       </div>
 
-                      {/* Team name */}
-                      <div className="col-span-2">
+                      {/* Team name + "You" badge */}
+                      <div className="col-span-3">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-sm">
+                          <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-sm shrink-0">
                             ⚡
                           </div>
-                          <div>
-                            <p className="font-semibold text-white text-sm">{entry.name}</p>
+                          <div className="min-w-0">
+                            <p className="font-semibold text-white text-sm truncate">{entry.name}</p>
                             {isMe && (
                               <span className="text-xs bg-green-500 text-gray-950 font-bold px-1.5 py-0.5 rounded-full">
                                 You
@@ -159,19 +264,40 @@ function Standings() {
                         </div>
                       </div>
 
-                      {/* Players */}
-                      <div className="col-span-1 text-center">
-                        <span className="text-gray-400 text-sm">{entry.players}</span>
+                      {/* W-L-D record */}
+                      <div className="col-span-2 text-center">
+                        <div className="flex items-center justify-center gap-1 text-sm font-mono">
+                          <span className="text-green-400 font-semibold">{entry.wins}W</span>
+                          <span className="text-gray-600">·</span>
+                          <span className="text-red-400 font-semibold">{entry.losses}L</span>
+                          {entry.draws > 0 && (
+                            <>
+                              <span className="text-gray-600">·</span>
+                              <span className="text-gray-400 font-semibold">{entry.draws}D</span>
+                            </>
+                          )}
+                        </div>
                       </div>
 
-                      {/* Points */}
-                      <div className="col-span-1 text-center">
+                      {/* Weekly / gameweek points */}
+                      <div className="col-span-2 text-center">
+                        {entry.weeklyPoints != null ? (
+                          <span className="text-blue-400 font-semibold text-sm">
+                            +{entry.weeklyPoints}
+                          </span>
+                        ) : (
+                          <span className="text-gray-600 text-sm">—</span>
+                        )}
+                      </div>
+
+                      {/* Total points */}
+                      <div className="col-span-2 text-center">
                         <span className="text-white font-bold text-lg">{entry.totalPoints}</span>
                       </div>
 
                       {/* Owner */}
-                      <div className="col-span-1 text-right">
-                        <span className="text-gray-400 text-sm">
+                      <div className="col-span-2 text-right">
+                        <span className="text-gray-400 text-sm truncate block">
                           {isMe ? 'You' : entry.owner?.username || 'Unknown'}
                         </span>
                       </div>
@@ -181,6 +307,11 @@ function Standings() {
                 )
               })}
             </div>
+
+            {/* Footer note */}
+            <p className="text-gray-600 text-xs text-center mt-6">
+              Trend arrows reflect rank change since your last visit · GW = gameweek points
+            </p>
           </>
         )}
 
