@@ -7,7 +7,7 @@ A full-stack fantasy sports management platform for building and tracking fantas
 ## Screenshots
 
 ### Login
-![Login Page](src\assets/login.png)
+![Login Page](src/assets/login.png)
 
 ### Dashboard
 ![Dashboard](./screenshots/dashboard.png)
