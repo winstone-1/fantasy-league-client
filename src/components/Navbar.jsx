@@ -12,6 +12,7 @@ function Navbar() {
   { label: 'My Team', path: '/teams' },
   { label: 'Players', path: '/search' },
   { label: 'Standings', path: '/standings' },
+  { label: 'Livematches', path: '/livematches' },
 ]
 
   const handleLogout = () => {

@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import League from './pages/League'
 import MyTeam from './pages/Teams'
 import LeagueDetail from './pages/LeagueDetail'
+import LiveMatches from './pages/Livematches'
 
 function App() {
   return (
@@ -20,7 +21,8 @@ function App() {
         <Route path="/register"  element={<Register />} />
         <Route path="/search"    element={<ProtectedRoute><Search /></ProtectedRoute>} />
         <Route path="/standings" element={<ProtectedRoute><Standings /></ProtectedRoute>} />
-       <Route path="/teams" element={<ProtectedRoute><MyTeam /></ProtectedRoute>} />
+        <Route path="/livematches" element={<ProtectedRoute><LiveMatches /></ProtectedRoute>} />
+        <Route path="/teams" element={<ProtectedRoute><MyTeam /></ProtectedRoute>} />
         <Route path="/leagues/:id" element={<ProtectedRoute><LeagueDetail /></ProtectedRoute>} />
         <Route path="*"          element={<NotFound />} />
       </Routes>
