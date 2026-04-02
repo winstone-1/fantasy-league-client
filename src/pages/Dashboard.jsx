@@ -53,7 +53,7 @@ function Dashboard() {
   const liveMatch    = matches.find(m => m.status === 'live')
   const upcomingMatch = matches.find(m => m.status === 'scheduled')
   const featuredMatch = liveMatch || upcomingMatch
-  const sports = { soccer: '⚽', basketball: '🏀' }
+  const sports = { soccer, basketball }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -82,7 +82,7 @@ function Dashboard() {
         {/* No league state */}
         {!league && !loading && (
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center mb-8">
-            <div className="text-5xl mb-4">🏟️</div>
+            <div className="text-5xl mb-4"></div>
             <h2 className="text-xl font-semibold mb-2">You're not in a league yet</h2>
             <p className="text-gray-400 text-sm mb-6">Create or join a league to get started</p>
             <button
@@ -114,13 +114,13 @@ function Dashboard() {
                 <>
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col items-center gap-3 flex-1">
-                      <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center text-3xl bg-gray-800 ${liveMatch ? 'border-green-500' : 'border-gray-700'}`}>⚡</div>
+                      <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center text-3xl bg-gray-800 ${liveMatch ? 'border-green-500' : 'border-gray-700'}`}></div>
                       <div className={`text-4xl font-bold ${liveMatch ? 'text-green-400' : 'text-white'}`}>{featuredMatch.homeScore ?? 0}</div>
                       <p className="text-white font-semibold text-center text-sm">{featuredMatch.homeTeam?.name || 'Home Team'}</p>
                     </div>
                     <div className="text-gray-600 text-2xl font-bold px-6">VS</div>
                     <div className="flex flex-col items-center gap-3 flex-1">
-                      <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center text-3xl bg-gray-800 ${liveMatch ? 'border-red-500' : 'border-gray-700'}`}>🔥</div>
+                      <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center text-3xl bg-gray-800 ${liveMatch ? 'border-red-500' : 'border-gray-700'}`}></div>
                       <div className={`text-4xl font-bold ${liveMatch ? 'text-red-400' : 'text-white'}`}>{featuredMatch.awayScore ?? 0}</div>
                       <p className="text-white font-semibold text-center text-sm">{featuredMatch.awayTeam?.name || 'Away Team'}</p>
                     </div>
