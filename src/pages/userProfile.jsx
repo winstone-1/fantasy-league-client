@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import api from '../api/axios'
-import { FaCrown, FaLock, FaGlobe, FaEdit, FaCog, FaMedal, FaStadium, FaHome, FaChartBar } from "react-icons/fa";
+import { FaCrown, FaLock, FaGlobe, FaEdit, FaCog, FaMedal, FaFutbol, FaHome, FaChartBar } from "react-icons/fa";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

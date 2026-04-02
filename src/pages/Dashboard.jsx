@@ -51,15 +51,13 @@ function Dashboard() {
     s.owner?._id === user?._id || s.owner?.email === user?.email
   ) + 1
 
-  const liveMatch    = matches.find(m => m.status === 'live')
+  const liveMatch     = matches.find(m => m.status === 'live')
   const upcomingMatch = matches.find(m => m.status === 'scheduled')
   const featuredMatch = liveMatch || upcomingMatch
-
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
-      
 
       <div className="max-w-5xl mx-auto px-8 py-8">
 
@@ -75,7 +73,7 @@ function Dashboard() {
           </div>
           {league && (
             <span className="text-sm bg-gray-900 border border-gray-800 px-4 py-2 rounded-xl text-gray-300 flex items-center gap-1">
-              {sports[league.sport] ? (league.sport === 'soccer' ? <FaTrophy /> : <FaTrophy />) : <FaTrophy />} {league.sport === 'soccer' ? 'Premier League' : 'NBA'}
+              <FaTrophy /> {league.sport === 'soccer' ? 'Premier League' : 'NBA'}
             </span>
           )}
         </div>
@@ -83,7 +81,7 @@ function Dashboard() {
         {/* No league state */}
         {!league && !loading && (
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center mb-8">
-            <div className="text-5xl mb-4"></div>
+            <div className="text-5xl mb-4">🏆</div>
             <h2 className="text-xl font-semibold mb-2">You're not in a league yet</h2>
             <p className="text-gray-400 text-sm mb-6">Create or join a league to get started</p>
             <button
@@ -182,7 +180,7 @@ function Dashboard() {
                           <img src={player.photo} alt={player.name} className="w-14 h-14 rounded-full object-cover border-2 border-gray-700" onError={e => e.target.style.display = 'none'}/>
                         ) : (
                           <div className="w-14 h-14 rounded-full bg-gray-700 flex items-center justify-center text-xl"><FaFutbol /></div>
-                        )}  
+                        )}
                       </div>
                       <p className="font-semibold text-xs text-white leading-tight">{player.name}</p>
                       <p className="text-gray-400 text-xs mt-0.5">{player.team?.slice(0, 3).toUpperCase() || '???'} · {player.position || 'MID'}</p>
@@ -204,13 +202,12 @@ function Dashboard() {
             {/* Quick actions */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: 'My Leagues', path: '/leagues' },
+                { label: 'My Leagues',      path: '/leagues' },
                 { label: 'Search Players',  path: '/search' },
-                { label: 'Standings',  path: '/standings' },
-                { label: 'Live Matches', path: '/matches' },
+                { label: 'Standings',       path: '/standings' },
+                { label: 'Live Matches',    path: '/matches' },
               ].map(action => (
                 <button key={action.path} onClick={() => navigate(action.path)} className="bg-gray-900 border border-gray-800 rounded-2xl p-4 hover:border-green-500 transition text-left">
-                  <div className="text-2xl mb-2">{action.icon}</div>
                   <p className="text-sm font-medium text-white">{action.label}</p>
                 </button>
               ))}
