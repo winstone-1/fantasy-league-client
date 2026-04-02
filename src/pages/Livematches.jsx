@@ -7,7 +7,7 @@ import { FaFutbol, FaBasketballBall } from 'react-icons/fa'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const POLL_INTERVAL = 30_000
+const POLL_INTERVAL = 30000
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -15,14 +15,14 @@ const getStatusPill = (status, minute, sport) => {
   const s = status?.toLowerCase()
 
   if (s === 'ht')
-    return { label: 'HT',    bg: 'bg-purple-600',  dot: false }
+    return { label: 'HT', bg: 'bg-purple-600', dot: false }
 
   if (s === 'ft' || s === 'final')
-    return { label: 'Final', bg: 'bg-gray-600',     dot: false }
+    return { label: 'Final', bg: 'bg-gray-600', dot: false }
 
   if (s === 'live' || s === 'in_play' || s === '1h' || s === '2h') {
     const label = sport === 'basketball' && minute
-      ? minute
+      ? `${minute}`
       : minute
         ? `${minute}'`
         : 'LIVE'
@@ -30,7 +30,7 @@ const getStatusPill = (status, minute, sport) => {
   }
 
   if (s === 'scheduled' || s === 'ns' || s === 'tbd')
-    return { label: 'Soon',  bg: 'bg-gray-700',     dot: false }
+    return { label: 'Soon', bg: 'bg-gray-700', dot: false }
 
   return { label: status ?? '—', bg: 'bg-gray-700', dot: false }
 }
@@ -52,10 +52,17 @@ const teamColor = (name = '') => {
   return palette[Math.abs(hash) % palette.length]
 }
 
+const getTeamName = (team) => {
+  if (typeof team === 'string') return team
+  return team.name
+}
+
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 const TickerCard = ({ match, active, onClick }) => {
   const pill = getStatusPill(match.status, match.minute, match.sport)
+  const homeTeamName = getTeamName(match.homeTeam)
+  const awayTeamName = getTeamName(match.awayTeam)
 
   return (
     <button
@@ -76,11 +83,11 @@ const TickerCard = ({ match, active, onClick }) => {
 
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <span className="text-white text-xs font-semibold">{teamInitials(match.homeTeam)}</span>
+          <span className="text-white text-xs font-semibold">{teamInitials(homeTeamName)}</span>
           <span className="text-white text-sm font-bold">{match.homeScore ?? 0}</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-gray-400 text-xs font-semibold">{teamInitials(match.awayTeam)}</span>
+          <span className="text-gray-400 text-xs font-semibold">{teamInitials(awayTeamName)}</span>
           <span className="text-gray-300 text-sm font-bold">{match.awayScore ?? 0}</span>
         </div>
       </div>
@@ -128,6 +135,8 @@ const PlayerRow = ({ player }) => {
 const MatchCard = ({ match }) => {
   const pill = getStatusPill(match.status, match.minute, match.sport)
   const myPlayers = match.myPlayers ?? []
+  const homeTeamName = getTeamName(match.homeTeam)
+  const awayTeamName = getTeamName(match.awayTeam)
 
   return (
     <div className="bg-gray-900/80 border border-gray-800 rounded-3xl overflow-hidden">
@@ -153,16 +162,16 @@ const MatchCard = ({ match }) => {
 
       <div className="flex items-center justify-between px-10 py-8">
         <div className="flex flex-col items-center gap-3">
-          <TeamAvatar name={match.homeTeam} size="lg" />
-          <p className="text-white font-semibold text-sm tracking-wide">{teamInitials(match.homeTeam)}</p>
+          <TeamAvatar name={homeTeamName} size="lg" />
+          <p className="text-white font-semibold text-sm tracking-wide">{teamInitials(homeTeamName)}</p>
           <p className="text-white font-black text-5xl leading-none">{match.homeScore ?? 0}</p>
         </div>
 
         <span className="text-gray-700 font-black text-2xl tracking-widest">VS</span>
 
         <div className="flex flex-col items-center gap-3">
-          <TeamAvatar name={match.awayTeam} size="lg" />
-          <p className="text-white font-semibold text-sm tracking-wide">{teamInitials(match.awayTeam)}</p>
+          <TeamAvatar name={awayTeamName} size="lg" />
+          <p className="text-white font-semibold text-sm tracking-wide">{teamInitials(awayTeamName)}</p>
           <p className="text-white font-black text-5xl leading-none">{match.awayScore ?? 0}</p>
         </div>
       </div>
@@ -210,10 +219,10 @@ const SkeletonCard = () => (
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 function LiveMatches() {
-  const [matches,  setMatches]  = useState([])
+  const [matches, setMatches] = useState([])
   const [selected, setSelected] = useState(null)
-  const [loading,  setLoading]  = useState(true)
-  const [error,    setError]    = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [lastPoll, setLastPoll] = useState(null)
   const intervalRef = useRef(null)
   const { user } = useAuth()
@@ -226,8 +235,9 @@ function LiveMatches() {
       setLastPoll(new Date())
       setError('')
       setSelected(prev => prev ?? data[0]?._id ?? null)
-    } catch {
+    } catch (err) {
       setError('Could not fetch live matches. Retrying…')
+      console.error('Error fetching matches:', err)
     } finally {
       setLoading(false)
     }
@@ -236,10 +246,17 @@ function LiveMatches() {
   useEffect(() => {
     fetchMatches()
     intervalRef.current = setInterval(fetchMatches, POLL_INTERVAL)
-    return () => clearInterval(intervalRef.current)
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
   }, [fetchMatches])
 
-  const liveCount   = matches.filter(m => ['live','in_play','1h','2h'].includes(m.status?.toLowerCase())).length
+  const liveCount = matches.filter(m => 
+    ['live', 'in_play', '1h', '2h'].includes(m.status?.toLowerCase())
+  ).length
+  
   const activeMatch = matches.find(m => m._id === selected)
 
   return (

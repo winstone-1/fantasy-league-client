@@ -11,6 +11,7 @@ import MyTeam from './pages/Teams'
 import LeagueDetail from './pages/LeagueDetail'
 import LiveMatches from './pages/Livematches'
 import UserProfile from './pages/userProfile'
+import MatchManagement from './pages/MatchManagement'
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
         <Route path="/teams" element={<ProtectedRoute><MyTeam /></ProtectedRoute>} />
         <Route path="/leagues/:id" element={<ProtectedRoute><LeagueDetail /></ProtectedRoute>} />
         <Route path="/profile" element={<UserProfile />} />
+        <Route path="/commissioner/matches" element={<MatchManagement />} />
         <Route path="*"          element={<NotFound />} />
       </Routes>
     </BrowserRouter>
