@@ -140,7 +140,9 @@ const FORMATIONS = {
 }
 
 // ── NBA lineups (expanded) ────────────────────────────────────────────
+// ── NBA lineups (35+ formations) ────────────────────────────────────────────
 const NBA_LINEUPS = {
+  // === STANDARD LINEUPS ===
   'Standard': [
     { id: 'NBA_PG', label: 'PG', bench: false },
     { id: 'NBA_SG', label: 'SG', bench: false },
@@ -151,6 +153,8 @@ const NBA_LINEUPS = {
     { id: 'NBA_B2', label: 'BN', bench: true  },
     { id: 'NBA_B3', label: 'BN', bench: true  },
   ],
+
+  // === SMALL BALL VARIATIONS ===
   'Small Ball': [
     { id: 'NBA_PG',  label: 'PG', bench: false },
     { id: 'NBA_SG',  label: 'SG', bench: false },
@@ -161,6 +165,30 @@ const NBA_LINEUPS = {
     { id: 'NBA_B2',  label: 'BN', bench: true  },
     { id: 'NBA_B3',  label: 'BN', bench: true  },
   ],
+  
+  'Micro Ball': [
+    { id: 'NBA_PG1', label: 'PG', bench: false },
+    { id: 'NBA_PG2', label: 'PG', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_PF',  label: 'PF', bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  'Ultra Small Ball': [
+    { id: 'NBA_PG1', label: 'PG', bench: false },
+    { id: 'NBA_PG2', label: 'PG', bench: false },
+    { id: 'NBA_SG1', label: 'SG', bench: false },
+    { id: 'NBA_SG2', label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  // === BIG BALL VARIATIONS ===
   'Big Ball': [
     { id: 'NBA_PG',  label: 'PG', bench: false },
     { id: 'NBA_SG',  label: 'SG', bench: false },
@@ -171,26 +199,97 @@ const NBA_LINEUPS = {
     { id: 'NBA_B1',  label: 'BN', bench: true  },
     { id: 'NBA_B2',  label: 'BN', bench: true  },
   ],
+
+  'Twin Towers': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_C1', label: 'C',  bench: false },
+    { id: 'NBA_C2', label: 'C',  bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+    { id: 'NBA_B3', label: 'BN', bench: true  },
+  ],
+
+  'Triple Towers': [
+    { id: 'NBA_PG',  label: 'PG', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_C1',  label: 'C',  bench: false },
+    { id: 'NBA_C2',  label: 'C',  bench: false },
+    { id: 'NBA_C3',  label: 'C',  bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+  ],
+
+  // === GUARD-FOCUSED LINEUPS ===
   'Three Guards': [
     { id: 'NBA_PG1', label: 'PG', bench: false },
     { id: 'NBA_PG2', label: 'PG', bench: false },
     { id: 'NBA_SG',  label: 'SG', bench: false },
     { id: 'NBA_SF',  label: 'SF', bench: false },
     { id: 'NBA_PF',  label: 'PF', bench: false },
-    { id: 'NBA_C',   label: 'C',  bench: false },
     { id: 'NBA_B1',  label: 'BN', bench: true  },
     { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
   ],
+
+  'Four Guards': [
+    { id: 'NBA_PG1', label: 'PG', bench: false },
+    { id: 'NBA_PG2', label: 'PG', bench: false },
+    { id: 'NBA_SG1', label: 'SG', bench: false },
+    { id: 'NBA_SG2', label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  'Five Guards': [
+    { id: 'NBA_PG1', label: 'PG', bench: false },
+    { id: 'NBA_PG2', label: 'PG', bench: false },
+    { id: 'NBA_SG1', label: 'SG', bench: false },
+    { id: 'NBA_SG2', label: 'SG', bench: false },
+    { id: 'NBA_PG3', label: 'PG', bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  // === SHOOTING-FOCUSED LINEUPS ===
   'Shooting Focus': [
     { id: 'NBA_PG',  label: 'PG', bench: false },
     { id: 'NBA_SG1', label: 'SG', bench: false },
     { id: 'NBA_SG2', label: 'SG', bench: false },
     { id: 'NBA_SF',  label: 'SF', bench: false },
     { id: 'NBA_PF',  label: 'PF', bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  'Three-Point Specialists': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_PF', label: 'PF', bench: false },
+    { id: 'NBA_C3', label: 'C',  bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+    { id: 'NBA_B3', label: 'BN', bench: true  },
+  ],
+
+  'Splash Brothers': [
+    { id: 'NBA_PG',  label: 'PG', bench: false },
+    { id: 'NBA_SG1', label: 'SG', bench: false },
+    { id: 'NBA_SG2', label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
     { id: 'NBA_C',   label: 'C',  bench: false },
     { id: 'NBA_B1',  label: 'BN', bench: true  },
     { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
   ],
+
+  // === DEFENSIVE LINEUPS ===
   'Defensive': [
     { id: 'NBA_PG',  label: 'PG', bench: false },
     { id: 'NBA_SG',  label: 'SG', bench: false },
@@ -201,6 +300,143 @@ const NBA_LINEUPS = {
     { id: 'NBA_B1',  label: 'BN', bench: true  },
     { id: 'NBA_B2',  label: 'BN', bench: true  },
   ],
+
+  'Lockdown Defense': [
+    { id: 'NBA_SG1', label: 'SG', bench: false },
+    { id: 'NBA_SG2', label: 'SG', bench: false },
+    { id: 'NBA_SF1', label: 'SF', bench: false },
+    { id: 'NBA_SF2', label: 'SF', bench: false },
+    { id: 'NBA_C',   label: 'C',  bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  'Rim Protection': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_C1', label: 'C',  bench: false },
+    { id: 'NBA_C2', label: 'C',  bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+    { id: 'NBA_B3', label: 'BN', bench: true  },
+  ],
+
+  'Swarm Defense': [
+    { id: 'NBA_PG',  label: 'PG', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_PF1', label: 'PF', bench: false },
+    { id: 'NBA_PF2', label: 'PF', bench: false },
+    { id: 'NBA_C',   label: 'C',  bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+  ],
+
+  // === POSITIONLESS / MODERN NBA ===
+  'Positionless': [
+    { id: 'NBA_G1', label: 'G', bench: false },
+    { id: 'NBA_G2', label: 'G', bench: false },
+    { id: 'NBA_F1', label: 'F', bench: false },
+    { id: 'NBA_F2', label: 'F', bench: false },
+    { id: 'NBA_F3', label: 'F', bench: false },
+    { id: 'NBA_C',  label: 'C', bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+  ],
+
+  'Small Forward Heavy': [
+    { id: 'NBA_PG',  label: 'PG', bench: false },
+    { id: 'NBA_SF1', label: 'SF', bench: false },
+    { id: 'NBA_SF2', label: 'SF', bench: false },
+    { id: 'NBA_SF3', label: 'SF', bench: false },
+    { id: 'NBA_PF',  label: 'PF', bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  'Point Forward': [
+    { id: 'NBA_SF1', label: 'SF', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_SF2', label: 'SF', bench: false },
+    { id: 'NBA_PF',  label: 'PF', bench: false },
+    { id: 'NBA_C',   label: 'C',  bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  'No Center': [
+    { id: 'NBA_PG',  label: 'PG', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_PF1', label: 'PF', bench: false },
+    { id: 'NBA_PF2', label: 'PF', bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  // === TEMPO-BASED LINEUPS ===
+  'Run & Gun': [
+    { id: 'NBA_PG1', label: 'PG', bench: false },
+    { id: 'NBA_PG2', label: 'PG', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_PF',  label: 'PF', bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  'Half-Court': [
+    { id: 'NBA_PG',  label: 'PG', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_PF1', label: 'PF', bench: false },
+    { id: 'NBA_C',   label: 'C',  bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  // === EXPERIMENTAL ===
+  '3-and-D': [
+    { id: 'NBA_SG1', label: 'SG', bench: false },
+    { id: 'NBA_SG2', label: 'SG', bench: false },
+    { id: 'NBA_SF1', label: 'SF', bench: false },
+    { id: 'NBA_SF2', label: 'SF', bench: false },
+    { id: 'NBA_PF',  label: 'PF', bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  'Stretch Bigs': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_PF', label: 'PF', bench: false },
+    { id: 'NBA_C3', label: 'C',  bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+    { id: 'NBA_B3', label: 'BN', bench: true  },
+  ],
+
+  'Euro Style': [
+    { id: 'NBA_PG',  label: 'PG', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_PF1', label: 'PF', bench: false },
+    { id: 'NBA_C',   label: 'C',  bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  // === ROSTER DEPTH VARIATIONS ===
   'Deep Bench': [
     { id: 'NBA_PG', label: 'PG', bench: false },
     { id: 'NBA_SG', label: 'SG', bench: false },
@@ -213,15 +449,125 @@ const NBA_LINEUPS = {
     { id: 'NBA_B4', label: 'BN', bench: true  },
     { id: 'NBA_B5', label: 'BN', bench: true  },
   ],
-  'Positionless': [
-    { id: 'NBA_G1', label: 'G', bench: false },
-    { id: 'NBA_G2', label: 'G', bench: false },
-    { id: 'NBA_F1', label: 'F', bench: false },
-    { id: 'NBA_F2', label: 'F', bench: false },
-    { id: 'NBA_F3', label: 'F', bench: false },
-    { id: 'NBA_C',  label: 'C', bench: false },
+
+  'Full Roster': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_PF', label: 'PF', bench: false },
+    { id: 'NBA_C',  label: 'C',  bench: false },
     { id: 'NBA_B1', label: 'BN', bench: true  },
     { id: 'NBA_B2', label: 'BN', bench: true  },
+    { id: 'NBA_B3', label: 'BN', bench: true  },
+    { id: 'NBA_B4', label: 'BN', bench: true  },
+    { id: 'NBA_B5', label: 'BN', bench: true  },
+    { id: 'NBA_B6', label: 'BN', bench: true  },
+    { id: 'NBA_B7', label: 'BN', bench: true  },
+  ],
+
+  'Playoff Rotation': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_PF', label: 'PF', bench: false },
+    { id: 'NBA_C',  label: 'C',  bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+    { id: 'NBA_B3', label: 'BN', bench: true  },
+    { id: 'NBA_B4', label: 'BN', bench: true  },
+  ],
+
+  'Clutch Time': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_PF', label: 'PF', bench: false },
+    { id: 'NBA_C',  label: 'C',  bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+  ],
+
+  // === DEVELOPMENT / YOUTH ===
+  'Young Core': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_PF', label: 'PF', bench: false },
+    { id: 'NBA_C',  label: 'C',  bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+    { id: 'NBA_B3', label: 'BN', bench: true  },
+    { id: 'NBA_B4', label: 'BN', bench: true  },
+    { id: 'NBA_B5', label: 'BN', bench: true  },
+  ],
+
+  'All-Rookie': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_PF', label: 'PF', bench: false },
+    { id: 'NBA_C',  label: 'C',  bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+    { id: 'NBA_B3', label: 'BN', bench: true  },
+    { id: 'NBA_B4', label: 'BN', bench: true  },
+  ],
+
+  // === VETERAN / EXPERIENCE ===
+  'Veteran Presence': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_PF', label: 'PF', bench: false },
+    { id: 'NBA_C',  label: 'C',  bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+    { id: 'NBA_B3', label: 'BN', bench: true  },
+  ],
+
+  'Old School': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_PF', label: 'PF', bench: false },
+    { id: 'NBA_C',  label: 'C',  bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+    { id: 'NBA_B3', label: 'BN', bench: true  },
+  ],
+
+  // === SPECIALIZED ===
+  'Slashing': [
+    { id: 'NBA_PG',  label: 'PG', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_SF1', label: 'SF', bench: false },
+    { id: 'NBA_SF2', label: 'SF', bench: false },
+    { id: 'NBA_PF',  label: 'PF', bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
+  ],
+
+  'Pick & Roll Heavy': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_PF', label: 'PF', bench: false },
+    { id: 'NBA_C',  label: 'C',  bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+    { id: 'NBA_B3', label: 'BN', bench: true  },
+  ],
+
+  'Iso Heavy': [
+    { id: 'NBA_PG1', label: 'PG', bench: false },
+    { id: 'NBA_PG2', label: 'PG', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_PF',  label: 'PF', bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+    { id: 'NBA_B3',  label: 'BN', bench: true  },
   ],
 }
 
