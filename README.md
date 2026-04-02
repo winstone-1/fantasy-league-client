@@ -122,16 +122,16 @@ npm run dev
 ![Dashboard](src/assets/Dashboard.png)
 
 ### Standings
-![Standings](./screenshots/standings.png)
+![Standings](src/assets/Standings.png)
 
 ### Live Matches
-![Live Matches](./screenshots/livematches.png)
+![Live Matches](src/assets/Livematches.png)
 
 ### Player Search
-![Player Search](./screenshots/search.png)
+![Player Search](src/assets/Search.png)
 
 ### User Profile
-![User Profile](./screenshots/profile.png)
+![User Profile](src/assets/userProfile.png.)
 
 ---
 
