@@ -70,7 +70,14 @@ function PlayerSlot({ position, player, sport, onDragOver, onDrop, onDragStart, 
     >
       <div
         draggable={!!player}
-        onDragStart={() => onDragStart && onDragStart(position, player)}
+        onDragStart={(e) => {
+          if (player) {
+            e.dataTransfer.setData('text/plain', JSON.stringify({ position: position, player: player }))
+            onDragStart && onDragStart(position, player)
+          } else {
+            e.preventDefault()
+          }
+        }}
         className={`relative w-14 h-14 rounded-full border-2 flex items-center justify-center transition ${
           player
             ? 'border-green-500 bg-gray-800 hover:border-green-400 shadow-lg shadow-green-500/20'
@@ -178,36 +185,62 @@ export default function Teams() {
   const [selectedSlot, setSelectedSlot] = useState(null)
   const [dragSource, setDragSource] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
-  useEffect(() => { fetchTeams() }, [user])
+  useEffect(() => { 
+    if (user) {
+      fetchTeams() 
+    }
+  }, [user])
 
   const fetchTeams = async () => {
     try {
       setLoading(true)
       const leaguesRes = await api.get('/leagues');
+      
+      // Reset states
+      let soccerTeamFound = null
+      let nbaTeamFound = null
+      let soccerPlayersMap = {}
+      let nbaPlayersMap = {}
+      
       for (const league of leaguesRes.data) {
-        const teamsRes = await api.get(`/leagues/${league._id}/teams`);
-        const myTeam = teamsRes.data.find(t => t.owner?._id === user?._id);
+        try {
+          const teamsRes = await api.get(`/leagues/${league._id}/teams`);
+          const myTeam = teamsRes.data.find(t => t.owner?._id === user?._id);
 
-        if (myTeam) {
-          const mapped = {};
-          myTeam.players?.forEach(item => {
-            if (item.position && item.player) {
-              mapped[item.position] = item.player;
+          if (myTeam) {
+            const mapped = {};
+            // Properly map players from the saved roster
+            if (myTeam.players && Array.isArray(myTeam.players)) {
+              myTeam.players.forEach(item => {
+                if (item.position && item.player) {
+                  // Handle both populated and unpopulated player data
+                  mapped[item.position] = item.player._id ? item.player : item.player;
+                }
+              });
             }
-          });
 
-          if (league.sport === 'soccer') {
-            setSoccerTeam({ ...myTeam, leagueId: league._id });
-            setSoccerPlayers(mapped);
-          } else {
-            setNbaTeam({ ...myTeam, leagueId: league._id });
-            setNbaPlayers(mapped);
+            if (league.sport === 'soccer') {
+              soccerTeamFound = { ...myTeam, leagueId: league._id };
+              soccerPlayersMap = mapped;
+            } else if (league.sport === 'basketball') {
+              nbaTeamFound = { ...myTeam, leagueId: league._id };
+              nbaPlayersMap = mapped;
+            }
           }
+        } catch (err) {
+          console.error(`Error fetching teams for league ${league._id}:`, err)
         }
       }
+      
+      setSoccerTeam(soccerTeamFound)
+      setNbaTeam(nbaTeamFound)
+      setSoccerPlayers(soccerPlayersMap)
+      setNbaPlayers(nbaPlayersMap)
+      
     } catch (err) { 
-      console.error(err); 
+      console.error('Error fetching teams:', err); 
     } finally {
       setLoading(false)
     }
@@ -215,6 +248,7 @@ export default function Teams() {
 
   const handleCreateTeam = async () => {
     try {
+      setLoading(true)
       const targetSport = sport === 'soccer' ? 'soccer' : 'basketball'
       const leaguesRes = await api.get('/leagues')
       const targetLeague = leaguesRes.data.find(l => l.sport === targetSport)
@@ -224,13 +258,31 @@ export default function Teams() {
         return navigate('/leagues')
       }
 
-      await api.post(`/leagues/${targetLeague._id}/teams`, {
+      const response = await api.post(`/leagues/${targetLeague._id}/teams`, {
         name: `${user.username || 'My'} ${sport === 'soccer' ? 'FC' : 'Squad'}`
       })
 
-      await fetchTeams()
+      // Create empty roster structure
+      const positions = sport === 'soccer' ? FORMATIONS[soccerFormation] : NBA_LINEUPS[nbaLineup]
+      const emptyRoster = positions.reduce((acc, pos) => {
+        acc[pos.id] = null
+        return acc
+      }, {})
+
+      if (sport === 'soccer') {
+        setSoccerTeam({ ...response.data, leagueId: targetLeague._id })
+        setSoccerPlayers(emptyRoster)
+      } else {
+        setNbaTeam({ ...response.data, leagueId: targetLeague._id })
+        setNbaPlayers(emptyRoster)
+      }
+
+      await fetchTeams() // Refresh to get the full team data
     } catch (err) {
+      console.error('Create team error:', err)
       alert(err.response?.data?.message || "Failed to create team.")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -239,7 +291,10 @@ export default function Teams() {
     try {
       const res = await api.get(`/players/sport/${sport === 'soccer' ? 'soccer' : 'basketball'}`)
       setAvailablePlayers(res.data)
-    } catch (err) { console.error(err) }
+    } catch (err) { 
+      console.error('Error fetching players:', err)
+      alert('Failed to load available players')
+    }
   }
 
   const assignPlayer = (pos, player) => {
@@ -251,40 +306,82 @@ export default function Teams() {
     setSelectedSlot(null);
   };
 
+  const removePlayer = (pos) => {
+    if (window.confirm('Remove this player from the roster?')) {
+      const setter = sport === 'soccer' ? setSoccerPlayers : setNbaPlayers;
+      setter(prev => ({
+        ...prev,
+        [pos.id]: null
+      }));
+    }
+  };
+
   const saveTeam = async () => {
     const currentTeam = sport === 'soccer' ? soccerTeam : nbaTeam;
     const currentPlayers = sport === 'soccer' ? soccerPlayers : nbaPlayers;
 
-    if (!currentTeam) return alert("No team initialized!");
+    if (!currentTeam) {
+      alert("No team initialized!");
+      return;
+    }
 
-    const roster = Object.entries(currentPlayers).map(([slotId, player]) => ({
-      position: slotId,
-      player: player._id
-    }));
+    // Filter out null/undefined players and prepare roster
+    const roster = Object.entries(currentPlayers)
+      .filter(([_, player]) => player && player._id)
+      .map(([slotId, player]) => ({
+        position: slotId,
+        player: player._id
+      }));
+
+    if (roster.length === 0) {
+      alert("Please add at least one player to your roster before saving.");
+      return;
+    }
 
     try {
-      setLoading(true);
+      setSaving(true);
       await api.put(`/leagues/${currentTeam.leagueId}/teams/${currentTeam._id}`, {
         players: roster
       });
+      
+      // Refresh team data after save to ensure consistency
+      await fetchTeams();
       alert("Team saved successfully!");
     } catch (err) {
-      console.error(err);
-      alert("Failed to save team.");
+      console.error('Save error:', err);
+      alert(err.response?.data?.message || "Failed to save team.");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  const handleDragStart = (pos, player) => setDragSource({ pos, player })
+  const handleDragStart = (pos, player) => {
+    if (player) {
+      setDragSource({ pos, player })
+    }
+  }
+  
+  const handleDragOver = (pos) => {
+    // Optional: Add visual feedback
+  }
+  
   const handleDrop = (targetPos) => {
     if (!dragSource) return
+    if (dragSource.pos.id === targetPos.id) {
+      setDragSource(null)
+      return
+    }
+    
     const setter = sport === 'soccer' ? setSoccerPlayers : setNbaPlayers
     setter(prev => {
       const next = { ...prev }
       const targetPlayer = next[targetPos.id]
-      next[targetPos.id] = dragSource.player
-      next[dragSource.pos.id] = targetPlayer || undefined
+      const sourcePlayer = next[dragSource.pos.id]
+      
+      // Swap players
+      next[targetPos.id] = sourcePlayer
+      next[dragSource.pos.id] = targetPlayer || null
+      
       return next
     })
     setDragSource(null)
@@ -293,7 +390,15 @@ export default function Teams() {
   const currentTeam = sport === 'soccer' ? soccerTeam : nbaTeam
   const currentPlayers = sport === 'soccer' ? soccerPlayers : nbaPlayers
   const positions = sport === 'soccer' ? FORMATIONS[soccerFormation] : NBA_LINEUPS[nbaLineup]
-  const playersCount = Object.keys(currentPlayers).filter(k => currentPlayers[k]).length;
+  const playersCount = Object.keys(currentPlayers).filter(k => currentPlayers[k] && currentPlayers[k]._id).length;
+
+  // Debug log to see what's being loaded
+  useEffect(() => {
+    if (currentTeam) {
+      console.log(`Loaded ${sport} team:`, currentTeam.name)
+      console.log(`Players:`, currentPlayers)
+    }
+  }, [currentTeam, currentPlayers, sport])
 
   return (
     <div className="min-h-screen bg-gray-950 text-white pb-32 selection:bg-green-500/30">
@@ -309,20 +414,25 @@ export default function Teams() {
           <div className="flex p-1.5 bg-gray-900/80 backdrop-blur border border-gray-800 rounded-2xl shadow-inner">
             <button 
               onClick={() => setSport('soccer')} 
-              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${sport === 'soccer' ? 'bg-green-500 text-gray-950 shadow-lg shadow-green-500/20' : 'text-gray-400 hover:text-white'}`}
+              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${sport === 'soccer' ? 'bg-green-500 text-gray-950 shadow-lg shadow-green-500/20' : 'text-gray-400 hover:text-white'}`}
             >
               <FaFutbol /> Soccer
             </button>
             <button 
               onClick={() => setSport('basketball')} 
-              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${sport === 'basketball' ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/20' : 'text-gray-400 hover:text-white'}`}
+              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${sport === 'basketball' ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/20' : 'text-gray-400 hover:text-white'}`}
             >
               <FaBasketballBall /> NBA
             </button>
           </div>
         </div>
 
-        {!currentTeam && !loading ? (
+        {loading ? (
+          <div className="bg-gray-900 border border-gray-800 rounded-[2rem] p-16 text-center shadow-2xl">
+            <div className="inline-block w-12 h-12 border-4 border-white/30 border-t-green-500 rounded-full animate-spin"></div>
+            <p className="text-gray-400 mt-4">Loading your teams...</p>
+          </div>
+        ) : !currentTeam ? (
           <div className="bg-gray-900 border border-gray-800 rounded-[2rem] p-16 text-center shadow-2xl">
             <div className="text-7xl mb-6 opacity-80 animate-bounce">{sport === 'soccer' ? <FaFutbol /> : <FaBasketballBall />}</div>
             <h2 className="text-2xl font-bold mb-3">No {sport} team detected</h2>
@@ -348,11 +458,11 @@ export default function Teams() {
               <div className="flex gap-3">
                  <button 
                   onClick={saveTeam} 
-                  disabled={loading}
+                  disabled={saving}
                   className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition flex items-center gap-2 shadow-lg shadow-blue-600/20"
                  >
-                   {loading ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : '💾'}
-                   Save Roster
+                   {saving ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : '💾'}
+                   {saving ? 'Saving...' : 'Save Roster'}
                  </button>
                  <button onClick={() => navigate('/search')} className="bg-white hover:bg-gray-200 text-gray-950 font-black px-5 py-2.5 rounded-xl text-xs transition shadow-lg">
                    + New Transfer
@@ -363,9 +473,23 @@ export default function Teams() {
             {/* Field/Pitch Component */}
             <div className="relative">
               {sport === 'soccer' ? (
-                <SoccerPitch positions={positions} players={currentPlayers} onSlotClick={openPicker} onDragStart={handleDragStart} onDrop={handleDrop} />
+                <SoccerPitch 
+                  positions={positions} 
+                  players={currentPlayers} 
+                  onSlotClick={openPicker} 
+                  onDragStart={handleDragStart} 
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop} 
+                />
               ) : (
-                <NBACourt positions={positions} players={currentPlayers} onSlotClick={openPicker} onDragStart={handleDragStart} onDrop={handleDrop} />
+                <NBACourt 
+                  positions={positions} 
+                  players={currentPlayers} 
+                  onSlotClick={openPicker} 
+                  onDragStart={handleDragStart} 
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop} 
+                />
               )}
               
               {/* Floating Summary Card */}
@@ -380,7 +504,7 @@ export default function Teams() {
                    </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] text-gray-500 italic">Auto-sync disabled</p>
+                  <p className="text-[10px] text-gray-500 italic">Changes auto-saved on "Save"</p>
                   <p className="text-xs font-medium text-gray-300">Click save to persist changes</p>
                 </div>
               </div>
