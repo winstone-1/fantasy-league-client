@@ -11,13 +11,12 @@ function Navbar() {
   const { user, logout } = useAuth()
   const [isCommissioner, setIsCommissioner] = useState(false)
 
-  // Check if user is commissioner of any league
   useEffect(() => {
     const checkCommissionerStatus = async () => {
       if (user) {
         try {
           const res = await api.get('/leagues')
-          const isCommish = res.data.some(league => 
+          const isCommish = res.data.some(league =>
             league.commissioner?._id === user._id
           )
           setIsCommissioner(isCommish)
@@ -30,11 +29,11 @@ function Navbar() {
   }, [user])
 
   const links = [
-    { label: 'Dashboard', path: '/' },
-    { label: 'My Leagues', path: '/leagues' },
-    { label: 'My Team', path: '/teams' },
-    { label: 'Players', path: '/search' },
-    { label: 'Standings', path: '/standings' },
+    { label: 'Dashboard',   path: '/' },
+    { label: 'My Leagues',  path: '/leagues' },
+    { label: 'My Team',     path: '/teams' },
+    { label: 'Players',     path: '/search' },
+    { label: 'Standings',   path: '/standings' },
     { label: 'Livematches', path: '/livematches' },
   ]
 
@@ -46,10 +45,7 @@ function Navbar() {
   return (
     <nav className="flex items-center justify-between px-8 py-4 border-b border-gray-800 bg-gray-950 sticky top-0 z-50">
       {/* Logo */}
-      <div
-        className="flex items-center gap-2 cursor-pointer"
-        onClick={() => navigate('/')}
-      >
+      <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
         <span className="text-green-400 text-2xl"><FaTrophy /></span>
         <span className="text-green-400 font-bold text-xl">FantasyLeague</span>
       </div>
@@ -69,18 +65,18 @@ function Navbar() {
             {link.label}
           </button>
         ))}
-        
-        {/* Commissioner Link - Only shows if user is commissioner */}
+
+        {/* Commissioner link — same style as other links */}
         {isCommissioner && (
           <button
             onClick={() => navigate('/commissioner/matches')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
               location.pathname === '/commissioner/matches'
-                ? 'bg-purple-600 text-white'
-                : 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
+                ? 'bg-gray-800 text-white'
+                : 'text-gray-400 hover:text-white'
             }`}
           >
-            ⚽ Manage Matches
+            Manage Matches
           </button>
         )}
       </div>

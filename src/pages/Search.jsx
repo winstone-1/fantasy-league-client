@@ -2,19 +2,19 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 import api from '../api/axios'
 import { FaBasketballBall, FaFutbol } from 'react-icons/fa'
 
-
 function Search() {
-  const [query, setQuery]       = useState('')
-  const [sport, setSport]       = useState('basketball')
-  const [players, setPlayers]   = useState([])
-  const [loading, setLoading]   = useState(false)
-  const [error, setError]       = useState('')
-  const [searched, setSearched] = useState(false)
-  const [myTeams, setMyTeams]   = useState([])
-  const [adding, setAdding]     = useState(null)
+  const [query, setQuery]           = useState('')
+  const [sport, setSport]           = useState('basketball')
+  const [players, setPlayers]       = useState([])
+  const [loading, setLoading]       = useState(false)
+  const [error, setError]           = useState('')
+  const [searched, setSearched]     = useState(false)
+  const [myTeams, setMyTeams]       = useState([])
+  const [adding, setAdding]         = useState(null)
   const [showPicker, setShowPicker] = useState(null)
   const [successMsg, setSuccessMsg] = useState('')
 
@@ -58,23 +58,6 @@ function Search() {
     }
   }
 
-  const handleAddToTeam = async (player, team) => {
-    setAdding(player._id)
-    try {
-      await api.post(`/leagues/${team.leagueId}/teams/${team._id}/players`, {
-        playerId: player._id
-      })
-      setSuccessMsg(`${player.name} added to ${team.name}!`)
-      setTimeout(() => setSuccessMsg(''), 3000)
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to add player')
-      setTimeout(() => setError(''), 3000)
-    } finally {
-      setAdding(null)
-      setShowPicker(null)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
@@ -86,14 +69,12 @@ function Search() {
           <p className="text-gray-400 mt-1">Find real NBA and EPL players for your fantasy team</p>
         </div>
 
-        {/* Success toast */}
         {successMsg && (
           <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded-xl mb-4 text-sm flex items-center gap-2">
             <span>✓</span> {successMsg}
           </div>
         )}
 
-        {/* Error toast */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl mb-4 text-sm">
             {error}
@@ -103,26 +84,27 @@ function Search() {
         {/* Search bar */}
         <form onSubmit={handleSearch} className="mb-8">
           <div className="flex flex-col sm:flex-row gap-3">
+
+            {/* ✅ Fixed toggle — each button always shows its own fixed label */}
             <div className="flex gap-2 bg-gray-900 p-1 rounded-xl border border-gray-800">
               <button
                 type="button"
                 onClick={() => setSport('basketball')}
-                className={`px-5 py-2 rounded-lg text-sm font-medium transition ${
+                className={`flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-medium transition ${
                   sport === 'basketball' ? 'bg-green-500 text-gray-950' : 'text-gray-400 hover:text-white'
                 }`}
               >
-                {sport === 'basketball' ? <FaBasketballBall className="inline mr-1" /> : <FaFutbol className="inline mr-1" />}
-                {sport === 'basketball' ? 'NBA' : 'EPL'}
+                <FaBasketballBall /> NBA
               </button>
               <button
                 type="button"
                 onClick={() => setSport('soccer')}
-                className={`px-5 py-2 rounded-lg text-sm font-medium transition ${
+                className={`flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-medium transition ${
                   sport === 'soccer' ? 'bg-green-500 text-gray-950' : 'text-gray-400 hover:text-white'
                 }`}
               >
-                {sport === 'soccer' ? <FaFutbol className="inline mr-1" /> : <FaBasketballBall className="inline mr-1" />}
-                {sport === 'soccer' ? 'EPL' : 'NBA'}</button>
+                <FaFutbol /> Soccer
+              </button>
             </div>
 
             <div className="flex flex-1 gap-3">
@@ -169,7 +151,9 @@ function Search() {
         {/* Default state */}
         {!loading && !searched && (
           <div className="text-center py-20">
-            <div className="text-5xl mb-4">{sport === 'basketball' ? <FaBasketballBall /> : <FaFutbol />}</div>
+            <div className="text-5xl mb-4 flex justify-center">
+              {sport === 'basketball' ? <FaBasketballBall /> : <FaFutbol />}
+            </div>
             <p className="text-gray-400 text-lg">Search for your favourite players</p>
             <p className="text-gray-600 text-sm mt-1">
               {sport === 'basketball' ? 'Try LeBron, Curry, Durant...' : 'Try Salah, Haaland, De Bruyne...'}
@@ -187,7 +171,6 @@ function Search() {
                   key={player._id}
                   className="bg-gray-900 border border-gray-800 rounded-2xl p-5 hover:border-green-500 transition group"
                 >
-                  {/* Photo */}
                   <div className="relative mx-auto w-16 h-16 mb-3">
                     {player.photo ? (
                       <img
@@ -208,7 +191,6 @@ function Search() {
                     </div>
                   </div>
 
-                  {/* Info */}
                   <div className="text-center">
                     <h3 className="font-semibold text-white text-sm leading-tight">{player.name}</h3>
                     <p className="text-gray-400 text-xs mt-1">{player.team || 'Unknown'}</p>
@@ -221,7 +203,6 @@ function Search() {
                     </div>
                   </div>
 
-                  {/* Add to team button */}
                   {myTeams.length > 0 ? (
                     <div className="relative mt-3">
                       <button
@@ -232,7 +213,6 @@ function Search() {
                         {adding === player._id ? 'Adding...' : '+ Add to Team'}
                       </button>
 
-                      {/* Team picker dropdown */}
                       {showPicker === player._id && (
                         <div className="absolute bottom-full left-0 right-0 mb-1 bg-gray-800 border border-gray-700 rounded-xl overflow-hidden z-10">
                           {myTeams.map(team => (
@@ -262,7 +242,7 @@ function Search() {
           </>
         )}
       </div>
-      
+      <Footer />
     </div>
   )
 }
