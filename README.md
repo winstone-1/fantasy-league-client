@@ -119,7 +119,7 @@ npm run dev
 ![Login Page](src/assets/login.png)
 
 ### Dashboard
-![Dashboard]()
+![Dashboard](src/assets/Dashboard.png)
 
 ### Standings
 ![Standings](./screenshots/standings.png)

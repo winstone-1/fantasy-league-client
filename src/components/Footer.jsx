@@ -1,53 +1,67 @@
 // src/components/Footer.jsx
 
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom'
+import { FaTrophy, FaFutbol, FaBasketballBall } from 'react-icons/fa'
 
 const Footer = () => {
   return (
-    <footer className="border-t border-white/10 pt-8 mt-auto">
-      {/* Top row */}
-      <div className="flex flex-wrap justify-between items-start gap-8 mb-8">
-        {/* Branding */}
-        <div>
-          <h2 className="text-white font-bold text-lg mb-2">FantasyDash</h2>
-          <p className="text-white/45 text-sm leading-relaxed">
-            Your all-in-one fantasy league <br />
-            dashboard for EPL &amp; NBA.
+    <footer className="border-t border-gray-800 bg-gray-950 mt-auto">
+      <div className="max-w-5xl mx-auto px-8 py-10">
+
+        {/* Top row */}
+        <div className="flex flex-wrap justify-between items-start gap-8 mb-8">
+
+          {/* Branding */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-green-400 text-xl"><FaTrophy /></span>
+              <span className="text-green-400 font-bold text-lg">FantasyLeague</span>
+            </div>
+            <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
+              Your all-in-one fantasy league<br />dashboard for EPL &amp; NBA.
+            </p>
+          </div>
+
+          {/* Nav links */}
+          <nav className="flex flex-wrap items-center gap-6">
+            {[
+              { label: 'Dashboard',  path: '/' },
+              { label: 'Standings',  path: '/standings' },
+              { label: 'Live',       path: '/livematches' },
+              { label: 'Players',    path: '/search' },
+              { label: 'Profile',    path: '/profile' },
+            ].map(({ label, path }) => (
+              <Link
+                key={path}
+                to={path}
+                className="text-gray-400 text-sm hover:text-white transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        {/* Bottom row */}
+        <div className="border-t border-gray-800 pt-6 flex flex-wrap justify-between items-center gap-4">
+          <p className="text-gray-600 text-xs">
+            © 2026 FantasyLeague · Built for the capstone 🏆
           </p>
+
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1.5 bg-gray-900 border border-gray-800 rounded-full px-3 py-1 text-xs text-gray-400">
+              <FaFutbol className="text-green-400" /> EPL
+            </span>
+            <span className="flex items-center gap-1.5 bg-gray-900 border border-gray-800 rounded-full px-3 py-1 text-xs text-gray-400">
+              <FaBasketballBall className="text-orange-400" /> NBA
+            </span>
+            <span className="text-gray-600 text-xs">Season 2026</span>
+          </div>
         </div>
 
-        {/* Nav links */}
-        <nav className="flex flex-wrap items-center gap-8">
-          {["Dashboard", "Standings", "Live", "Players", "Profile"].map((item) => (
-            <Link
-              key={item}
-              to={`/${item.toLowerCase()}`}
-              className="text-white/55 text-sm hover:text-white transition-colors"
-            >
-              {item}
-            </Link>
-          ))}
-        </nav>
-      </div>
-
-      {/* Bottom row */}
-      <div className="border-t border-white/10 pt-5 flex flex-wrap justify-between items-center gap-4">
-        <p className="text-white/30 text-xs">
-          © 2026 FantasyDash · Built for the capstone 
-        </p>
-
-        <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1.5 bg-white/6 border border-white/10 rounded-full px-3 py-1 text-xs text-white">
-             EPL
-          </span>
-          <span className="flex items-center gap-1.5 bg-white/6 border border-white/10 rounded-full px-3 py-1 text-xs text-white">
-             NBA
-          </span>
-          <span className="text-white/30 text-xs">Season 2026</span>
-        </div>
       </div>
     </footer>
-  );
-};
+  )
+}
 
-export default Footer;
+export default Footer
