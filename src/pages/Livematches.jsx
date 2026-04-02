@@ -3,19 +3,14 @@ import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { FaFutbol, FaBasketballBall, FaStadium } from 'react-icons/fa'
+import { FaFutbol, FaBasketballBall } from 'react-icons/fa'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const POLL_INTERVAL = 30_000 // 30 seconds
+const POLL_INTERVAL = 30_000
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/**
- * Returns display info for a match status.
- * status: 'live' | 'ht' | 'ft' | 'final' | 'scheduled' | 'NS'
- * minute: e.g. 67 (soccer) or 'Q3 8:24' (NBA)
- */
 const getStatusPill = (status, minute, sport) => {
   const s = status?.toLowerCase()
 
@@ -27,9 +22,9 @@ const getStatusPill = (status, minute, sport) => {
 
   if (s === 'live' || s === 'in_play' || s === '1h' || s === '2h') {
     const label = sport === 'basketball' && minute
-      ? minute                              // e.g. 'Q3 8:24'
+      ? minute
       : minute
-        ? `${minute}'`                      // e.g. "67'"
+        ? `${minute}'`
         : 'LIVE'
     return { label, bg: 'bg-green-500', dot: true }
   }
@@ -46,7 +41,6 @@ const sportIcon = (sport) =>
 const teamInitials = (name = '') =>
   name.slice(0, 3).toUpperCase()
 
-/** Pick a deterministic avatar bg color from a team name */
 const teamColor = (name = '') => {
   const palette = [
     'bg-red-700', 'bg-blue-700', 'bg-emerald-700',
@@ -60,7 +54,6 @@ const teamColor = (name = '') => {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-/** Single card in the horizontal live ticker */
 const TickerCard = ({ match, active, onClick }) => {
   const pill = getStatusPill(match.status, match.minute, match.sport)
 
@@ -73,7 +66,6 @@ const TickerCard = ({ match, active, onClick }) => {
           : 'bg-gray-900 border-gray-800 hover:border-gray-600'
         }`}
     >
-      {/* Status pill */}
       <div className="flex items-center justify-between mb-3">
         <span className="text-lg">{sportIcon(match.sport)}</span>
         <span className={`flex items-center gap-1.5 text-xs font-bold text-white px-2 py-0.5 rounded-full ${pill.bg}`}>
@@ -82,7 +74,6 @@ const TickerCard = ({ match, active, onClick }) => {
         </span>
       </div>
 
-      {/* Teams + scores */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
           <span className="text-white text-xs font-semibold">{teamInitials(match.homeTeam)}</span>
@@ -97,7 +88,6 @@ const TickerCard = ({ match, active, onClick }) => {
   )
 }
 
-/** Team avatar circle */
 const TeamAvatar = ({ name, size = 'lg' }) => {
   const color = teamColor(name)
   const sizeClass = size === 'lg'
@@ -111,7 +101,6 @@ const TeamAvatar = ({ name, size = 'lg' }) => {
   )
 }
 
-/** Player row inside a match card */
 const PlayerRow = ({ player }) => {
   const color = teamColor(player.team)
   return (
@@ -136,7 +125,6 @@ const PlayerRow = ({ player }) => {
   )
 }
 
-/** Full expanded match card */
 const MatchCard = ({ match }) => {
   const pill = getStatusPill(match.status, match.minute, match.sport)
   const myPlayers = match.myPlayers ?? []
@@ -144,7 +132,6 @@ const MatchCard = ({ match }) => {
   return (
     <div className="bg-gray-900/80 border border-gray-800 rounded-3xl overflow-hidden">
 
-      {/* Card header bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-gray-800">
         <div className="flex items-center gap-2.5">
           <span className="text-xl">{sportIcon(match.sport)}</span>
@@ -158,26 +145,21 @@ const MatchCard = ({ match }) => {
           </div>
         </div>
 
-        {/* Live status pill */}
         <span className={`flex items-center gap-1.5 text-xs font-bold text-white px-3 py-1 rounded-full ${pill.bg}`}>
           {pill.dot && <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
           {pill.label}
         </span>
       </div>
 
-      {/* Scoreboard */}
       <div className="flex items-center justify-between px-10 py-8">
-        {/* Home */}
         <div className="flex flex-col items-center gap-3">
           <TeamAvatar name={match.homeTeam} size="lg" />
           <p className="text-white font-semibold text-sm tracking-wide">{teamInitials(match.homeTeam)}</p>
           <p className="text-white font-black text-5xl leading-none">{match.homeScore ?? 0}</p>
         </div>
 
-        {/* VS */}
         <span className="text-gray-700 font-black text-2xl tracking-widest">VS</span>
 
-        {/* Away */}
         <div className="flex flex-col items-center gap-3">
           <TeamAvatar name={match.awayTeam} size="lg" />
           <p className="text-white font-semibold text-sm tracking-wide">{teamInitials(match.awayTeam)}</p>
@@ -185,7 +167,6 @@ const MatchCard = ({ match }) => {
         </div>
       </div>
 
-      {/* Players in this game */}
       {myPlayers.length > 0 && (
         <div className="px-5 pb-5">
           <div className="border-t border-gray-800 pt-4 mb-3">
@@ -230,14 +211,13 @@ const SkeletonCard = () => (
 
 function LiveMatches() {
   const [matches,  setMatches]  = useState([])
-  const [selected, setSelected] = useState(null) // selected match _id
+  const [selected, setSelected] = useState(null)
   const [loading,  setLoading]  = useState(true)
   const [error,    setError]    = useState('')
   const [lastPoll, setLastPoll] = useState(null)
   const intervalRef = useRef(null)
   const { user } = useAuth()
 
-  // ── Fetch live matches ──────────────────────────────────────────────────
   const fetchMatches = useCallback(async () => {
     try {
       const res = await api.get('/matches/live')
@@ -245,7 +225,6 @@ function LiveMatches() {
       setMatches(data)
       setLastPoll(new Date())
       setError('')
-      // Auto-select first match if nothing selected yet
       setSelected(prev => prev ?? data[0]?._id ?? null)
     } catch {
       setError('Could not fetch live matches. Retrying…')
@@ -254,25 +233,21 @@ function LiveMatches() {
     }
   }, [])
 
-  // ── Initial fetch + polling setup ────────────────────────────────────────
   useEffect(() => {
     fetchMatches()
     intervalRef.current = setInterval(fetchMatches, POLL_INTERVAL)
     return () => clearInterval(intervalRef.current)
   }, [fetchMatches])
 
-  // ── Derived state ────────────────────────────────────────────────────────
-  const liveCount  = matches.filter(m => ['live','in_play','1h','2h'].includes(m.status?.toLowerCase())).length
+  const liveCount   = matches.filter(m => ['live','in_play','1h','2h'].includes(m.status?.toLowerCase())).length
   const activeMatch = matches.find(m => m._id === selected)
 
-  // ─── Render ──────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-6 py-8 space-y-6">
 
-        {/* ── Page header ── */}
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3">
@@ -287,7 +262,6 @@ function LiveMatches() {
             <p className="text-gray-500 mt-1 text-sm">Real-time updates for your fantasy players</p>
           </div>
 
-          {/* Last updated */}
           {lastPoll && (
             <p className="text-gray-600 text-xs mt-1">
               Updated {lastPoll.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -295,14 +269,12 @@ function LiveMatches() {
           )}
         </div>
 
-        {/* ── Error banner ── */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
             {error}
           </div>
         )}
 
-        {/* ── Live Ticker ── */}
         {!loading && matches.length > 0 && (
           <div className="bg-gray-900/60 border border-gray-800 rounded-3xl p-5">
             <div className="flex items-center gap-2 mb-4">
@@ -322,7 +294,6 @@ function LiveMatches() {
           </div>
         )}
 
-        {/* ── Loading skeletons ── */}
         {loading && (
           <div className="space-y-4">
             <SkeletonCard />
@@ -330,19 +301,16 @@ function LiveMatches() {
           </div>
         )}
 
-        {/* ── No matches ── */}
         {!loading && matches.length === 0 && !error && (
           <div className="text-center py-24">
-            <div className="text-5xl mb-4"><FaStadium /></div>
+            <div className="text-5xl mb-4"><FaFutbol /></div>
             <p className="text-gray-400 text-lg font-medium">No live matches right now</p>
             <p className="text-gray-600 text-sm mt-1">Check back when your gameweek starts</p>
           </div>
         )}
 
-        {/* ── Match cards ── */}
         {!loading && matches.length > 0 && (
           <div className="space-y-4">
-            {/* Show selected match first, then the rest */}
             {[
               ...(activeMatch ? [activeMatch] : []),
               ...matches.filter(m => m._id !== selected),
@@ -352,7 +320,6 @@ function LiveMatches() {
           </div>
         )}
 
-        {/* ── Poll interval note ── */}
         {!loading && matches.length > 0 && (
           <p className="text-gray-700 text-xs text-center pb-4">
             Scores refresh every 30 seconds · tap a match in the ticker to jump to it
@@ -360,7 +327,7 @@ function LiveMatches() {
         )}
 
       </div>
-        <Footer />
+      <Footer />
     </div>
   )
 }

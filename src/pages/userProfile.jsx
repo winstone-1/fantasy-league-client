@@ -4,8 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import api from '../api/axios'
-import UserProfile from './pages/userProfile'
-import { FaCrown, FaLock, FaGlobe, FaEdit, FaCog, FaMedal, FaFutbol, FaHome, FaChartBar } from "react-icons/fa";
+import { FaCrown, FaLock, FaGlobe, FaEdit, FaCog, FaMedal, FaFutbol, FaHome, FaChartBar } from 'react-icons/fa'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -33,6 +32,9 @@ const formatDate = (dateStr) => {
   })
 }
 
+const sportLabel = (sport) =>
+  sport === 'basketball' ? '🏀 NBA' : '⚽ EPL'
+
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 const StatPill = ({ label, value, accent = 'text-white' }) => (
@@ -49,9 +51,10 @@ const LeagueCard = ({ league, userId, standings }) => {
   const myEntry = standings?.find(s =>
     s.owner?._id === userId || s.owner?.email === userId
   )
- const rank = myEntry?.rank ?? (standings?.findIndex(
-  s => s.owner?._id === userId || s.owner?.email === userId
-) + 1 || null);
+  const rank = myEntry?.rank ?? (standings?.findIndex(
+    s => s.owner?._id === userId || s.owner?.email === userId
+  ) + 1 || null)
+
   return (
     <div className="bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-2xl p-5 transition-all duration-200">
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -72,7 +75,6 @@ const LeagueCard = ({ league, userId, standings }) => {
       </div>
 
       <div className="flex items-center gap-4 mt-4">
-        {/* Rank */}
         <div className="flex items-center gap-1.5">
           <span className="text-gray-600 text-xs">Rank</span>
           <span className="text-white font-bold text-sm">
@@ -82,7 +84,6 @@ const LeagueCard = ({ league, userId, standings }) => {
 
         <div className="w-px h-4 bg-gray-800" />
 
-        {/* Members */}
         <div className="flex items-center gap-1.5">
           <span className="text-gray-600 text-xs">Members</span>
           <span className="text-white font-bold text-sm">{league.members?.length ?? 0}</span>
@@ -90,13 +91,11 @@ const LeagueCard = ({ league, userId, standings }) => {
 
         <div className="w-px h-4 bg-gray-800" />
 
-        {/* Privacy */}
         <div className={`flex items-center gap-1.5 text-xs ${league.isPrivate ? 'text-red-400' : 'text-green-400'}`}>
           {league.isPrivate ? <FaLock /> : <FaGlobe />}
           {league.isPrivate ? 'Private' : 'Public'}
         </div>
 
-        {/* Invite code — only shown to commissioner */}
         {isCommissioner && league.inviteCode && (
           <>
             <div className="w-px h-4 bg-gray-800" />
@@ -119,13 +118,13 @@ function UserProfile() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
-  const [leagues,    setLeagues]    = useState([])
-  const [standings,  setStandings]  = useState({}) // { leagueId: [...] }
-  const [loading,    setLoading]    = useState(true)
-  const [editMode,   setEditMode]   = useState(false)
+  const [leagues,     setLeagues]     = useState([])
+  const [standings,   setStandings]   = useState({})
+  const [loading,     setLoading]     = useState(true)
+  const [editMode,    setEditMode]    = useState(false)
   const [displayName, setDisplayName] = useState('')
-  const [saving,     setSaving]     = useState(false)
-  const [saveMsg,    setSaveMsg]    = useState('')
+  const [saving,      setSaving]      = useState(false)
+  const [saveMsg,     setSaveMsg]     = useState('')
 
   useEffect(() => {
     setDisplayName(user?.username || '')
@@ -137,7 +136,6 @@ function UserProfile() {
       const res = await api.get('/leagues')
       setLeagues(res.data)
 
-      // Fetch standings for each league in parallel
       const standingsMap = {}
       await Promise.all(
         res.data.map(async (league) => {
@@ -151,7 +149,7 @@ function UserProfile() {
       )
       setStandings(standingsMap)
     } catch {
-      // silently fail — leagues section just shows empty
+      // silently fail
     } finally {
       setLoading(false)
     }
@@ -181,12 +179,11 @@ function UserProfile() {
     navigate('/login')
   }
 
-  // Derived stats
   const commissionerCount = leagues.filter(l =>
     l.commissioner?._id === user?._id || l.commissioner === user?._id
   ).length
 
-  const totalPoints = Object.entries(standings).reduce((sum, [leagueId, entries]) => {
+  const totalPoints = Object.entries(standings).reduce((sum, [, entries]) => {
     const me = entries.find(s => s.owner?._id === user?._id || s.owner?.email === user?.email)
     return sum + (me?.totalPoints ?? 0)
   }, 0)
@@ -203,12 +200,10 @@ function UserProfile() {
         <div className="bg-gray-900 border border-gray-800 rounded-3xl p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
 
-            {/* Avatar */}
             <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-2xl font-black text-white shrink-0 shadow-lg`}>
               {getInitials(user?.username || user?.email)}
             </div>
 
-            {/* Info */}
             <div className="flex-1 text-center sm:text-left">
               {editMode ? (
                 <div className="flex items-center gap-2 justify-center sm:justify-start mb-1">
@@ -254,7 +249,6 @@ function UserProfile() {
               <p className="text-gray-400 text-sm">{user?.email}</p>
 
               <div className="flex items-center gap-2 justify-center sm:justify-start mt-2 flex-wrap">
-                {/* Role badge */}
                 <span className={`text-xs px-2.5 py-1 rounded-full border font-semibold flex items-center gap-1 ${
                   user?.role === 'admin'
                     ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
@@ -264,14 +258,12 @@ function UserProfile() {
                   {user?.role === 'admin' ? 'Admin' : 'Member'}
                 </span>
 
-                {/* Joined date */}
                 <span className="text-xs text-gray-600">
                   Joined {formatDate(user?.createdAt)}
                 </span>
               </div>
             </div>
 
-            {/* Logout */}
             <button
               onClick={handleLogout}
               className="shrink-0 text-xs text-gray-500 hover:text-red-400 border border-gray-800 hover:border-red-500/30 px-4 py-2 rounded-xl transition"
@@ -283,9 +275,9 @@ function UserProfile() {
 
         {/* ── Stats row ── */}
         <div className="grid grid-cols-3 gap-3">
-          <StatPill label="Leagues"       value={leagues.length}    accent="text-white" />
-          <StatPill label="Commissioner"  value={commissionerCount} accent="text-yellow-400" />
-          <StatPill label="Total Points"  value={totalPoints}       accent="text-green-400" />
+          <StatPill label="Leagues"      value={leagues.length}    accent="text-white" />
+          <StatPill label="Commissioner" value={commissionerCount} accent="text-yellow-400" />
+          <StatPill label="Total Points" value={totalPoints}       accent="text-green-400" />
         </div>
 
         {/* ── Leagues ── */}
@@ -311,7 +303,7 @@ function UserProfile() {
             </div>
           ) : leagues.length === 0 ? (
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
-              <p className="text-4xl mb-3"><FaStadium /></p>
+              <p className="text-4xl mb-3"><FaFutbol /></p>
               <p className="text-gray-400 text-sm">You haven't joined any leagues yet</p>
               <button
                 onClick={() => navigate('/leagues')}
@@ -337,7 +329,7 @@ function UserProfile() {
         {/* ── Quick actions ── */}
         <div className="grid grid-cols-2 gap-3 pb-4">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/')}
             className="bg-gray-900 border border-gray-800 hover:border-green-500 rounded-2xl p-4 text-left transition"
           >
             <div className="text-2xl mb-1"><FaHome /></div>
