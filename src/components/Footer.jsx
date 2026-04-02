@@ -1,11 +1,11 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 
 const NAV_LINKS = [
-  { label: 'Dashboard',   path: '/dashboard',  icon: '🏠' },
-  { label: 'Standings',   path: '/standings',  icon: '📊' },
-  { label: 'Live',        path: '/matches',    icon: '⚡' },
-  { label: 'Players',     path: '/search',     icon: '🔍' },
-  { label: 'Profile',     path: '/profile',    icon: '👤' },
+  { label: 'Dashboard',   path: '/dashboard' },
+  { label: 'Standings',   path: '/standings' },
+  { label: 'Live',        path: '/matches' },
+  { label: 'Players',     path: '/search' },
+  { label: 'Profile',     path: '/profile' },
 ]
 
 function Footer() {
@@ -22,7 +22,7 @@ function Footer() {
           {/* Brand */}
           <div className="shrink-0">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-green-400 text-xl">⚡</span>
+              <span className="text-green-400 text-xl"></span>
               <span className="text-white font-bold text-lg tracking-tight">FantasyDash</span>
             </div>
             <p className="text-gray-500 text-xs max-w-[200px] leading-relaxed">
@@ -64,7 +64,7 @@ function Footer() {
             <span className="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full">
               🏀 NBA
             </span>
-            <span className="text-xs text-gray-600">Season 2025</span>
+            <span className="text-xs text-gray-600">Season 2026</span>
           </div>
         </div>
 

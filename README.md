@@ -4,27 +4,7 @@ A full-stack fantasy sports management platform for building and tracking fantas
 
 ---
 
-## Screenshots
 
-### Login
-![Login Page](src/assets/login.png)
-
-### Dashboard
-![Dashboard](./screenshots/dashboard.png)
-
-### Standings
-![Standings](./screenshots/standings.png)
-
-### Live Matches
-![Live Matches](./screenshots/livematches.png)
-
-### Player Search
-![Player Search](./screenshots/search.png)
-
-### User Profile
-![User Profile](./screenshots/profile.png)
-
----
 
 ## Tech Stack
 
@@ -131,6 +111,27 @@ npm run dev
 |---------|----------|-----|
 | Backend | Railway | `https://fantasy-league-server-production.up.railway.app` |
 | Frontend | Vercel | `https://fantasy-league-client.vercel.app` |
+
+---
+## Screenshots
+
+### Login
+![Login Page](src/assets/login.png)
+
+### Dashboard
+![Dashboard](./screenshots/dashboard.png)
+
+### Standings
+![Standings](./screenshots/standings.png)
+
+### Live Matches
+![Live Matches](./screenshots/livematches.png)
+
+### Player Search
+![Player Search](./screenshots/search.png)
+
+### User Profile
+![User Profile](./screenshots/profile.png)
 
 ---
 
