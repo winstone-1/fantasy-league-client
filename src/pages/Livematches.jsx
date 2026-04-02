@@ -3,6 +3,7 @@ import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { FaFutbol, FaBasketballBall, FaStadium } from 'react-icons/fa'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 

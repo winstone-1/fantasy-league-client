@@ -1,6 +1,9 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { FaTrophy } from 'react-icons/fa'
+import { Link } from 'react-router-dom'
+
+
 
 function Navbar() {
   const navigate  = useNavigate()
@@ -29,7 +32,7 @@ function Navbar() {
         onClick={() => navigate('/')}
       >
         <span className="text-green-400 text-2xl"><FaTrophy /></span>
-        <span className="text-green-400 font-bold text-xl">FantasySports</span>
+        <span className="text-green-400 font-bold text-xl">FantasyLeague</span>
       </div>
 
       {/* Links */}
@@ -54,7 +57,9 @@ function Navbar() {
         {user?.photo && (
           <img src={user.photo} className="w-8 h-8 rounded-full" />
         )}
-        <span className="text-sm text-gray-400">{user?.username}</span>
+        <Link to="/profile" className="text-white hover:text-green-400 transition">
+  {user?.username || user?.email?.split('@')[0]}
+</Link>
         <button
           onClick={handleLogout}
           className="text-sm text-gray-500 hover:text-red-400 transition px-3 py-1.5 rounded-lg hover:bg-red-500/10"
