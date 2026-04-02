@@ -62,11 +62,11 @@ function Search() {
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-8 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Player Search</h1>
-          <p className="text-gray-400 mt-1">Find real NBA and EPL players for your fantasy team</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold">Player Search</h1>
+          <p className="text-gray-400 mt-1 text-sm sm:text-base">Find real NBA and EPL players for your fantasy team</p>
         </div>
 
         {successMsg && (
@@ -82,15 +82,15 @@ function Search() {
         )}
 
         {/* Search bar */}
-        <form onSubmit={handleSearch} className="mb-8">
-          <div className="flex flex-col sm:flex-row gap-3">
+        <form onSubmit={handleSearch} className="mb-6 sm:mb-8">
+          <div className="flex flex-col gap-3">
 
-            {/* ✅ Fixed toggle — each button always shows its own fixed label */}
-            <div className="flex gap-2 bg-gray-900 p-1 rounded-xl border border-gray-800">
+            {/* Sport toggle */}
+            <div className="flex gap-2 bg-gray-900 p-1 rounded-xl border border-gray-800 self-start">
               <button
                 type="button"
                 onClick={() => setSport('basketball')}
-                className={`flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-medium transition ${
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition ${
                   sport === 'basketball' ? 'bg-green-500 text-gray-950' : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -99,7 +99,7 @@ function Search() {
               <button
                 type="button"
                 onClick={() => setSport('soccer')}
-                className={`flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-medium transition ${
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition ${
                   sport === 'soccer' ? 'bg-green-500 text-gray-950' : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -107,20 +107,21 @@ function Search() {
               </button>
             </div>
 
-            <div className="flex flex-1 gap-3">
+            {/* Search input row */}
+            <div className="flex gap-2 sm:gap-3">
               <input
                 type="text"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder={sport === 'basketball' ? 'Search e.g. LeBron James...' : 'Search e.g. Mohamed Salah...'}
-                className="flex-1 bg-gray-900 border border-gray-800 text-white rounded-xl px-5 py-3 text-sm focus:outline-none focus:border-green-500 transition"
+                className="flex-1 bg-gray-900 border border-gray-800 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition"
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-green-500 hover:bg-green-400 disabled:opacity-50 text-gray-950 font-bold px-8 py-3 rounded-xl transition"
+                className="bg-green-500 hover:bg-green-400 disabled:opacity-50 text-gray-950 font-bold px-5 sm:px-8 py-3 rounded-xl transition text-sm shrink-0"
               >
-                {loading ? 'Searching...' : 'Search'}
+                {loading ? '...' : 'Search'}
               </button>
             </div>
           </div>
@@ -128,10 +129,10 @@ function Search() {
 
         {/* Loading skeletons */}
         {loading && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 animate-pulse">
-                <div className="w-16 h-16 rounded-full bg-gray-800 mx-auto mb-3"/>
+              <div key={i} className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-5 animate-pulse">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gray-800 mx-auto mb-3"/>
                 <div className="h-4 bg-gray-800 rounded mb-2"/>
                 <div className="h-3 bg-gray-800 rounded w-2/3 mx-auto"/>
               </div>
@@ -141,7 +142,7 @@ function Search() {
 
         {/* Empty state */}
         {!loading && searched && players.length === 0 && (
-          <div className="text-center py-20">
+          <div className="text-center py-16 sm:py-20">
             <div className="text-5xl mb-4">🔍</div>
             <p className="text-gray-400 text-lg">No players found for "{query}"</p>
             <p className="text-gray-600 text-sm mt-1">Try a different name or switch sport</p>
@@ -150,7 +151,7 @@ function Search() {
 
         {/* Default state */}
         {!loading && !searched && (
-          <div className="text-center py-20">
+          <div className="text-center py-16 sm:py-20">
             <div className="text-5xl mb-4 flex justify-center">
               {sport === 'basketball' ? <FaBasketballBall /> : <FaFutbol />}
             </div>
@@ -165,34 +166,34 @@ function Search() {
         {!loading && players.length > 0 && (
           <>
             <p className="text-gray-400 text-sm mb-4">{players.length} player{players.length !== 1 ? 's' : ''} found</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
               {players.map(player => (
                 <div
                   key={player._id}
-                  className="bg-gray-900 border border-gray-800 rounded-2xl p-5 hover:border-green-500 transition group"
+                  className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-5 hover:border-green-500 transition group"
                 >
-                  <div className="relative mx-auto w-16 h-16 mb-3">
+                  <div className="relative mx-auto w-14 h-14 sm:w-16 sm:h-16 mb-3">
                     {player.photo ? (
                       <img
                         src={player.photo}
                         alt={player.name}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-gray-700 group-hover:border-green-500 transition"
+                        className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-700 group-hover:border-green-500 transition"
                         onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }}
                       />
                     ) : null}
                     <div
-                      className="w-16 h-16 rounded-full bg-gray-800 border-2 border-gray-700 items-center justify-center text-2xl"
+                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gray-800 border-2 border-gray-700 items-center justify-center text-xl sm:text-2xl"
                       style={{ display: player.photo ? 'none' : 'flex' }}
                     >
                       {sport === 'basketball' ? <FaBasketballBall /> : <FaFutbol />}
                     </div>
-                    <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gray-950 flex items-center justify-center text-xs">
+                    <div className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gray-950 flex items-center justify-center text-xs">
                       {sport === 'basketball' ? <FaBasketballBall /> : <FaFutbol />}
                     </div>
                   </div>
 
                   <div className="text-center">
-                    <h3 className="font-semibold text-white text-sm leading-tight">{player.name}</h3>
+                    <h3 className="font-semibold text-white text-xs sm:text-sm leading-tight">{player.name}</h3>
                     <p className="text-gray-400 text-xs mt-1">{player.team || 'Unknown'}</p>
                     <div className="flex justify-center gap-1 mt-2 flex-wrap">
                       {player.position && (

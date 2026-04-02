@@ -50,44 +50,42 @@ function League() {
     }
   }
 
- const handleJoin = async (e) => {
-  e.preventDefault()
-  setError('')
-  try {
-    await api.post('/leagues/join', { inviteCode: inviteCode.trim().toUpperCase() })
-    setSuccess('Joined league!')
-    setShowJoin(false)
-    setInviteCode('')
-    fetchLeagues()
-  } catch (err) {
-    setError(err.response?.data?.message || 'Invalid invite code')
+  const handleJoin = async (e) => {
+    e.preventDefault()
+    setError('')
+    try {
+      await api.post('/leagues/join', { inviteCode: inviteCode.trim().toUpperCase() })
+      setSuccess('Joined league!')
+      setShowJoin(false)
+      setInviteCode('')
+      fetchLeagues()
+    } catch (err) {
+      setError(err.response?.data?.message || 'Invalid invite code')
+    }
   }
-}
 
   return (
-   
     <div className="min-h-screen bg-gray-950 text-white">
+      <Navbar />
 
-        <Navbar />
-
-      <div className="max-w-4xl mx-auto px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-bold">My Leagues</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">My Leagues</h1>
             <p className="text-gray-400 mt-1">Create or join a fantasy league</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3">
             <button
               onClick={() => { setShowJoin(true); setShowCreate(false); setError('') }}
-              className="px-5 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:border-green-500 hover:text-green-400 text-sm font-medium transition"
+              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:border-green-500 hover:text-green-400 text-sm font-medium transition"
             >
               + Join League
             </button>
             <button
               onClick={() => { setShowCreate(true); setShowJoin(false); setError('') }}
-              className="px-5 py-2.5 rounded-xl bg-green-500 hover:bg-green-400 text-gray-950 text-sm font-bold transition"
+              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-green-500 hover:bg-green-400 text-gray-950 text-sm font-bold transition"
             >
               + Create League
             </button>
@@ -110,7 +108,7 @@ function League() {
 
         {/* Create League Form */}
         {showCreate && (
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-6">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 mb-6">
             <h2 className="text-lg font-semibold mb-4">Create a new league</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
@@ -125,16 +123,16 @@ function League() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm text-gray-400 mb-1.5">Sport</label>
                   <select
                     value={form.sport}
                     onChange={e => setForm({ ...form, sport: e.target.value })}
-                    className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition"
+                    className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-green-500 transition"
                   >
-                    <option value="soccer"> Soccer / EPL</option>
-                    <option value="basketball"> Basketball / NBA</option>
+                    <option value="soccer">Soccer / EPL</option>
+                    <option value="basketball">Basketball / NBA</option>
                   </select>
                 </div>
                 <div>
@@ -142,7 +140,7 @@ function League() {
                   <select
                     value={form.maxTeams}
                     onChange={e => setForm({ ...form, maxTeams: Number(e.target.value) })}
-                    className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition"
+                    className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-green-500 transition"
                   >
                     {[4, 6, 8, 10, 12].map(n => (
                       <option key={n} value={n}>{n} teams</option>
@@ -157,7 +155,7 @@ function League() {
                   id="isPrivate"
                   checked={form.isPrivate}
                   onChange={e => setForm({ ...form, isPrivate: e.target.checked })}
-                  className="w-4 h-4 accent-green-500"
+                  className="w-4 h-4 accent-green-500 shrink-0"
                 />
                 <label htmlFor="isPrivate" className="text-sm text-gray-400">
                   Private league (invite code required to join)
@@ -185,7 +183,7 @@ function League() {
 
         {/* Join League Form */}
         {showJoin && (
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-6">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6 mb-6">
             <h2 className="text-lg font-semibold mb-4">Join a league</h2>
             <form onSubmit={handleJoin} className="space-y-4">
               <div>
@@ -232,7 +230,7 @@ function League() {
 
         {!loading && leagues.length === 0 && !showCreate && !showJoin && (
           <div className="text-center py-20">
-            <div className="text-5xl mb-4"></div>
+            <div className="text-5xl mb-4">🏆</div>
             <p className="text-gray-400 text-lg">You're not in any leagues yet</p>
             <p className="text-gray-600 text-sm mt-1">Create one or join with an invite code</p>
           </div>
@@ -244,29 +242,35 @@ function League() {
               <div
                 key={league._id}
                 onClick={() => navigate(`/leagues/${league._id}`)}
-                className="bg-gray-900 border border-gray-800 rounded-2xl p-5 hover:border-green-500 transition cursor-pointer"
+                className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-5 hover:border-green-500 transition cursor-pointer"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center text-2xl">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gray-800 flex items-center justify-center text-xl sm:text-2xl shrink-0">
                       {league.sport === 'soccer' ? <FaFutbol /> : <FaBasketballBall />}
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-white">{league.name}</h3>
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-white truncate">{league.name}</h3>
                       <p className="text-gray-400 text-sm">
                         {league.members?.length} members · Season {league.season}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                     {league.commissioner?._id === user?._id && (
-                      <span className="text-xs bg-green-500/10 text-green-400 border border-green-500/30 px-2 py-1 rounded-full flex items-center gap-1">
+                      <span className="text-xs bg-green-500/10 text-green-400 border border-green-500/30 px-2 py-1 rounded-full hidden sm:flex items-center gap-1">
                         <FaCrown /> Commissioner
                       </span>
                     )}
+                    {/* Mobile: show crown icon only */}
+                    {league.commissioner?._id === user?._id && (
+                      <span className="sm:hidden text-green-400 text-sm">
+                        <FaCrown />
+                      </span>
+                    )}
                     <div className="text-right">
-                      <p className="text-xs text-gray-500">Invite Code</p>
-                      <p className="font-mono text-green-400 text-sm font-bold">{league.inviteCode}</p>
+                      <p className="text-xs text-gray-500 hidden sm:block">Invite Code</p>
+                      <p className="font-mono text-green-400 text-xs sm:text-sm font-bold">{league.inviteCode}</p>
                     </div>
                     <span className="text-gray-600">→</span>
                   </div>

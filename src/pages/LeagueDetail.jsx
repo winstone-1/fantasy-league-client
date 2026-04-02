@@ -80,7 +80,7 @@ export default function LeagueDetail() {
   if (loading) return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
-      <div className="max-w-4xl mx-auto px-8 py-16 text-center">
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center">
         <div className="text-gray-400 animate-pulse">Loading league...</div>
       </div>
     </div>
@@ -89,7 +89,7 @@ export default function LeagueDetail() {
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col">
       <Navbar />
-      <div className="flex-1 max-w-4xl mx-auto w-full px-8 py-8">
+      <div className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-8 py-6 sm:py-8">
 
         {/* Back */}
         <button
@@ -111,18 +111,18 @@ export default function LeagueDetail() {
         )}
 
         {/* League header */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-gray-800 flex items-center justify-center text-3xl">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-6 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gray-800 flex items-center justify-center text-2xl sm:text-3xl shrink-0">
                 {sports[league?.sport] || <FaTrophy />}
               </div>
               <div>
-                <h1 className="text-2xl font-bold">{league?.name}</h1>
+                <h1 className="text-xl sm:text-2xl font-bold">{league?.name}</h1>
                 <p className="text-gray-400 text-sm mt-1">
                   {league?.sport} · Season {league?.season} · {teams.length}/{league?.maxTeams} teams
                 </p>
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-2 mt-2 flex-wrap">
                   {isCommissioner && (
                     <span className="text-xs bg-green-500/10 text-green-400 border border-green-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
                       <FaEdit className="text-xs" /> Commissioner
@@ -137,20 +137,21 @@ export default function LeagueDetail() {
               </div>
             </div>
 
-            <div className="text-right">
-              {/* Commissioner action — contextual, not in navbar */}
+            <div className="sm:text-right flex sm:flex-col items-center sm:items-end gap-3 sm:gap-0">
               {isCommissioner && (
                 <button
                   onClick={() => navigate('/commissioner/matches')}
-                  className="mb-3 bg-green-500 hover:bg-green-400 text-gray-950 font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2"
+                  className="sm:mb-3 bg-green-500 hover:bg-green-400 text-gray-950 font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2 shrink-0"
                 >
-                  <FaCalendarAlt /> Manage Matches
+                  <FaCalendarAlt /> <span className="hidden sm:inline">Manage Matches</span><span className="sm:hidden">Manage</span>
                 </button>
               )}
-              <p className="text-xs text-gray-500 mb-1">Invite Code</p>
-              <p className="font-mono text-green-400 text-lg font-bold tracking-widest">
-                {league?.inviteCode}
-              </p>
+              <div>
+                <p className="text-xs text-gray-500 mb-0.5">Invite Code</p>
+                <p className="font-mono text-green-400 text-base sm:text-lg font-bold tracking-widest">
+                  {league?.inviteCode}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -165,7 +166,7 @@ export default function LeagueDetail() {
                   + Create My Team
                 </button>
               ) : (
-                <form onSubmit={handleCreateTeam} className="flex gap-3">
+                <form onSubmit={handleCreateTeam} className="flex flex-col sm:flex-row gap-3">
                   <input
                     type="text"
                     value={teamName}
@@ -174,12 +175,14 @@ export default function LeagueDetail() {
                     required
                     className="flex-1 bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-green-500"
                   />
-                  <button type="submit" className="bg-green-500 hover:bg-green-400 text-gray-950 font-bold px-5 py-2 rounded-xl text-sm transition">
-                    Create
-                  </button>
-                  <button type="button" onClick={() => setShowCreateTeam(false)} className="text-gray-400 hover:text-white px-3 py-2 text-sm">
-                    Cancel
-                  </button>
+                  <div className="flex gap-2">
+                    <button type="submit" className="flex-1 sm:flex-none bg-green-500 hover:bg-green-400 text-gray-950 font-bold px-5 py-2 rounded-xl text-sm transition">
+                      Create
+                    </button>
+                    <button type="button" onClick={() => setShowCreateTeam(false)} className="flex-1 sm:flex-none text-gray-400 hover:text-white px-3 py-2 text-sm border border-gray-700 rounded-xl">
+                      Cancel
+                    </button>
+                  </div>
                 </form>
               )}
             </div>
@@ -198,7 +201,7 @@ export default function LeagueDetail() {
                 onClick={() => navigate('/teams')}
                 className="text-green-400 text-sm hover:text-green-300 transition"
               >
-                Manage Team →
+                Manage →
               </button>
             </div>
           )}
@@ -210,7 +213,7 @@ export default function LeagueDetail() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium capitalize transition ${
+              className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-medium capitalize transition ${
                 activeTab === tab
                   ? 'bg-green-500 text-gray-950'
                   : 'text-gray-400 hover:text-white'
@@ -236,28 +239,28 @@ export default function LeagueDetail() {
                   return (
                     <div
                       key={team._id}
-                      className={`bg-gray-900 border rounded-2xl p-5 transition ${
+                      className={`bg-gray-900 border rounded-2xl p-4 sm:p-5 transition ${
                         isMe ? 'border-green-500 bg-green-500/5' : 'border-gray-800'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-lg">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-800 flex items-center justify-center text-base sm:text-lg shrink-0">
                             {sports[league?.sport] || '⚡'}
                           </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className="font-semibold text-white">{team.name}</p>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-semibold text-white truncate">{team.name}</p>
                               {isMe && (
-                                <span className="text-xs bg-green-500 text-gray-950 font-bold px-1.5 py-0.5 rounded-full">You</span>
+                                <span className="text-xs bg-green-500 text-gray-950 font-bold px-1.5 py-0.5 rounded-full shrink-0">You</span>
                               )}
                             </div>
-                            <p className="text-gray-400 text-xs mt-0.5">
+                            <p className="text-gray-400 text-xs mt-0.5 truncate">
                               {team.owner?.username || team.owner?.email} · {team.players?.length || 0} players
                             </p>
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right shrink-0 ml-2">
                           <p className="text-white font-bold">{team.totalPoints}</p>
                           <p className="text-gray-500 text-xs">points</p>
                         </div>
@@ -278,7 +281,8 @@ export default function LeagueDetail() {
               <div className="text-center py-12 text-gray-500">No standings yet</div>
             ) : (
               <>
-                <div className="grid grid-cols-6 text-xs text-gray-500 uppercase tracking-wider px-5 mb-2">
+                {/* Desktop headers */}
+                <div className="hidden sm:grid grid-cols-6 text-xs text-gray-500 uppercase tracking-wider px-5 mb-2">
                   <span>Rank</span>
                   <span className="col-span-3">Team</span>
                   <span className="text-center">Players</span>
@@ -295,7 +299,24 @@ export default function LeagueDetail() {
                         }`}
                       >
                         {isMe && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 bg-green-500 rounded-r-full"/>}
-                        <div className="grid grid-cols-6 items-center">
+                        {/* Mobile layout */}
+                        <div className="flex items-center justify-between sm:hidden">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${getRankStyle(entry.rank)}`}>
+                              {entry.rank}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="font-semibold text-sm">{entry.name}</p>
+                                {isMe && <span className="text-xs bg-green-500 text-gray-950 font-bold px-1.5 py-0.5 rounded-full">You</span>}
+                              </div>
+                              <p className="text-gray-500 text-xs">{entry.players} players</p>
+                            </div>
+                          </div>
+                          <p className="font-bold text-white">{entry.totalPoints} pts</p>
+                        </div>
+                        {/* Desktop layout */}
+                        <div className="hidden sm:grid grid-cols-6 items-center">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${getRankStyle(entry.rank)}`}>
                             {entry.rank}
                           </div>
@@ -344,7 +365,7 @@ export default function LeagueDetail() {
             ) : (
               <div className="space-y-3">
                 {matches.map(match => (
-                  <div key={match._id} className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                  <div key={match._id} className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-5">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-xs text-gray-500">Week {match.week || 1}</span>
                       <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
@@ -362,7 +383,7 @@ export default function LeagueDetail() {
                         <p className="font-semibold text-sm">{match.homeTeam?.name || 'TBD'}</p>
                         <p className="text-2xl font-bold text-white mt-1">{match.homeScore ?? 0}</p>
                       </div>
-                      <div className="text-gray-600 text-xl font-bold px-6">VS</div>
+                      <div className="text-gray-600 text-lg sm:text-xl font-bold px-4">VS</div>
                       <div className="flex-1 text-right">
                         <p className="font-semibold text-sm">{match.awayTeam?.name || 'TBD'}</p>
                         <p className="text-2xl font-bold text-white mt-1">{match.awayScore ?? 0}</p>

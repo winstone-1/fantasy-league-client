@@ -26,7 +26,6 @@ function Dashboard() {
       const firstLeague = leaguesRes.data[0]
       setLeague(firstLeague)
 
-      // Check if user is commissioner of this league
       setIsCommissioner(firstLeague.commissioner?._id === user?._id)
 
       const [standingsRes, matchesRes] = await Promise.all([
@@ -63,12 +62,12 @@ function Dashboard() {
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-8 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
 
         {/* Welcome */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-2xl font-bold">
+            <h1 className="text-xl sm:text-2xl font-bold">
               Welcome back, {user?.username || user?.email?.split('@')[0]} <FaHandSparkles className="inline ml-1" />
             </h1>
             <p className="text-gray-400 text-sm mt-1">
@@ -76,16 +75,16 @@ function Dashboard() {
             </p>
           </div>
           {league && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {isCommissioner && (
                 <button
                   onClick={() => navigate('/commissioner/matches')}
-                  className="text-sm bg-green-600 hover:bg-green-500 border border-green-500/30 px-4 py-2 rounded-xl text-white flex items-center gap-2 transition"
+                  className="text-sm bg-green-600 hover:bg-green-500 border border-green-500/30 px-3 py-2 rounded-xl text-white flex items-center gap-2 transition"
                 >
                   <FaEdit className="text-xs" /> Manage Matches
                 </button>
               )}
-              <span className="text-sm bg-gray-900 border border-gray-800 px-4 py-2 rounded-xl text-gray-300 flex items-center gap-1">
+              <span className="text-sm bg-gray-900 border border-gray-800 px-3 py-2 rounded-xl text-gray-300 flex items-center gap-1">
                 <FaTrophy /> {league.sport === 'soccer' ? 'Premier League' : 'NBA'}
               </span>
             </div>
@@ -94,7 +93,7 @@ function Dashboard() {
 
         {/* No league state */}
         {!league && !loading && (
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center mb-8">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 sm:p-10 text-center mb-8">
             <div className="text-5xl mb-4">🏆</div>
             <h2 className="text-xl font-semibold mb-2">You're not in a league yet</h2>
             <p className="text-gray-400 text-sm mb-6">Create or join a league to get started</p>
@@ -109,10 +108,10 @@ function Dashboard() {
 
         {league && (
           <>
-            {/* Commissioner Banner - Only shows if user is commissioner */}
+            {/* Commissioner Banner */}
             {isCommissioner && (
               <div className="bg-green-900/20 border border-green-500/30 rounded-2xl p-4 mb-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div>
                     <h3 className="text-green-400 font-semibold flex items-center gap-2">
                       <FaEdit /> Commissioner Tools
@@ -123,7 +122,7 @@ function Dashboard() {
                   </div>
                   <button
                     onClick={() => navigate('/commissioner/matches')}
-                    className="bg-green-600 hover:bg-green-500 px-5 py-2.5 rounded-xl font-semibold transition flex items-center gap-2"
+                    className="bg-green-600 hover:bg-green-500 px-5 py-2.5 rounded-xl font-semibold transition flex items-center gap-2 self-start sm:self-auto shrink-0"
                   >
                     <FaCalendarAlt /> Manage Matches
                   </button>
@@ -132,7 +131,7 @@ function Dashboard() {
             )}
 
             {/* Live Match Card */}
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-6">
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-6 mb-6">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-xs text-gray-400 uppercase tracking-wider">
                   {featuredMatch ? `Gameweek ${featuredMatch.week}` : 'No matches scheduled'}
@@ -148,20 +147,20 @@ function Dashboard() {
               {featuredMatch ? (
                 <>
                   <div className="flex items-center justify-between">
-                    <div className="flex flex-col items-center gap-3 flex-1">
-                      <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center text-3xl bg-gray-800 ${liveMatch ? 'border-green-500' : 'border-gray-700'}`}>
+                    <div className="flex flex-col items-center gap-2 sm:gap-3 flex-1">
+                      <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-full border-4 flex items-center justify-center text-2xl sm:text-3xl bg-gray-800 ${liveMatch ? 'border-green-500' : 'border-gray-700'}`}>
                         {featuredMatch.homeTeam?.name?.[0] || '?'}
                       </div>
-                      <div className={`text-4xl font-bold ${liveMatch ? 'text-green-400' : 'text-white'}`}>{featuredMatch.homeScore ?? 0}</div>
-                      <p className="text-white font-semibold text-center text-sm">{featuredMatch.homeTeam?.name || 'Home Team'}</p>
+                      <div className={`text-3xl sm:text-4xl font-bold ${liveMatch ? 'text-green-400' : 'text-white'}`}>{featuredMatch.homeScore ?? 0}</div>
+                      <p className="text-white font-semibold text-center text-xs sm:text-sm">{featuredMatch.homeTeam?.name || 'Home Team'}</p>
                     </div>
-                    <div className="text-gray-600 text-2xl font-bold px-6">VS</div>
-                    <div className="flex flex-col items-center gap-3 flex-1">
-                      <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center text-3xl bg-gray-800 ${liveMatch ? 'border-red-500' : 'border-gray-700'}`}>
+                    <div className="text-gray-600 text-xl sm:text-2xl font-bold px-3 sm:px-6">VS</div>
+                    <div className="flex flex-col items-center gap-2 sm:gap-3 flex-1">
+                      <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-full border-4 flex items-center justify-center text-2xl sm:text-3xl bg-gray-800 ${liveMatch ? 'border-red-500' : 'border-gray-700'}`}>
                         {featuredMatch.awayTeam?.name?.[0] || '?'}
                       </div>
-                      <div className={`text-4xl font-bold ${liveMatch ? 'text-red-400' : 'text-white'}`}>{featuredMatch.awayScore ?? 0}</div>
-                      <p className="text-white font-semibold text-center text-sm">{featuredMatch.awayTeam?.name || 'Away Team'}</p>
+                      <div className={`text-3xl sm:text-4xl font-bold ${liveMatch ? 'text-red-400' : 'text-white'}`}>{featuredMatch.awayScore ?? 0}</div>
+                      <p className="text-white font-semibold text-center text-xs sm:text-sm">{featuredMatch.awayTeam?.name || 'Away Team'}</p>
                     </div>
                   </div>
 
@@ -196,46 +195,46 @@ function Dashboard() {
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-                <p className="text-gray-400 text-sm mb-1">Total Points</p>
-                <p className="text-3xl font-bold text-white">{myTeam?.totalPoints ?? 0}</p>
-                <p className="text-green-400 text-xs mt-1">+{myTeam?.totalPoints ?? 0} this season</p>
+            <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-3 sm:p-5">
+                <p className="text-gray-400 text-xs sm:text-sm mb-1">Total Points</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{myTeam?.totalPoints ?? 0}</p>
+                <p className="text-green-400 text-xs mt-1 hidden sm:block">+{myTeam?.totalPoints ?? 0} this season</p>
               </div>
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-                <p className="text-gray-400 text-sm mb-1">League Rank</p>
-                <p className="text-3xl font-bold text-white">{myRank > 0 ? `#${myRank}` : '—'}</p>
-                <p className="text-gray-500 text-xs mt-1">of {standings.length} teams</p>
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-3 sm:p-5">
+                <p className="text-gray-400 text-xs sm:text-sm mb-1">League Rank</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{myRank > 0 ? `#${myRank}` : '—'}</p>
+                <p className="text-gray-500 text-xs mt-1 hidden sm:block">of {standings.length} teams</p>
               </div>
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-                <p className="text-gray-400 text-sm mb-1">My Players</p>
-                <p className="text-3xl font-bold text-white">{myTeam?.players ?? 0}</p>
-                <p className="text-gray-500 text-xs mt-1">in squad</p>
+              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-3 sm:p-5">
+                <p className="text-gray-400 text-xs sm:text-sm mb-1">My Players</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{myTeam?.players ?? 0}</p>
+                <p className="text-gray-500 text-xs mt-1 hidden sm:block">in squad</p>
               </div>
             </div>
 
             {/* Best performers */}
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-6">
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-6 mb-6">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="font-semibold text-lg">Best Performers This Week</h2>
+                <h2 className="font-semibold text-base sm:text-lg">Best Performers This Week</h2>
                 <button onClick={() => navigate('/search')} className="text-green-400 text-sm hover:text-green-300 transition">View All →</button>
               </div>
 
               {topPlayers.length > 0 ? (
-                <div className="flex gap-4 overflow-x-auto pb-2">
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                   {topPlayers.map((player, i) => (
-                    <div key={player._id} className={`flex-shrink-0 w-36 bg-gray-800 rounded-2xl p-4 text-center border-2 transition ${i === 0 ? 'border-green-500' : 'border-transparent hover:border-gray-600'}`}>
-                      <div className="relative mx-auto w-14 h-14 mb-3">
+                    <div key={player._id} className={`flex-shrink-0 w-32 sm:w-36 bg-gray-800 rounded-2xl p-3 sm:p-4 text-center border-2 transition ${i === 0 ? 'border-green-500' : 'border-transparent hover:border-gray-600'}`}>
+                      <div className="relative mx-auto w-12 h-12 sm:w-14 sm:h-14 mb-2 sm:mb-3">
                         {player.photo ? (
-                          <img src={player.photo} alt={player.name} className="w-14 h-14 rounded-full object-cover border-2 border-gray-700" onError={e => e.target.style.display = 'none'}/>
+                          <img src={player.photo} alt={player.name} className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-gray-700" onError={e => e.target.style.display = 'none'}/>
                         ) : (
-                          <div className="w-14 h-14 rounded-full bg-gray-700 flex items-center justify-center text-xl"><FaFutbol /></div>
+                          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gray-700 flex items-center justify-center text-lg sm:text-xl"><FaFutbol /></div>
                         )}
                       </div>
                       <p className="font-semibold text-xs text-white leading-tight">{player.name}</p>
                       <p className="text-gray-400 text-xs mt-0.5">{player.team?.slice(0, 3).toUpperCase() || '???'} · {player.position || 'MID'}</p>
-                      <div className="mt-3 bg-gray-900 rounded-xl py-2">
-                        <p className="text-green-400 font-bold text-lg">{(i + 1) * 4 + 12}</p>
+                      <div className="mt-2 sm:mt-3 bg-gray-900 rounded-xl py-1.5 sm:py-2">
+                        <p className="text-green-400 font-bold text-base sm:text-lg">{(i + 1) * 4 + 12}</p>
                         <p className="text-gray-500 text-xs">POINTS</p>
                       </div>
                     </div>

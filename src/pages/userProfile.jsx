@@ -6,19 +6,14 @@ import Footer from '../components/Footer'
 import api from '../api/axios'
 import { FaCrown, FaLock, FaGlobe, FaEdit, FaCog, FaMedal, FaFutbol, FaHome, FaChartBar } from 'react-icons/fa'
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
 const getInitials = (name = '') =>
   name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '??'
 
 const avatarColor = (name = '') => {
   const colors = [
-    'from-green-500 to-emerald-700',
-    'from-blue-500 to-indigo-700',
-    'from-purple-500 to-violet-700',
-    'from-amber-500 to-orange-700',
-    'from-rose-500 to-red-700',
-    'from-cyan-500 to-teal-700',
+    'from-green-500 to-emerald-700', 'from-blue-500 to-indigo-700',
+    'from-purple-500 to-violet-700', 'from-amber-500 to-orange-700',
+    'from-rose-500 to-red-700', 'from-cyan-500 to-teal-700',
   ]
   let hash = 0
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
@@ -27,43 +22,32 @@ const avatarColor = (name = '') => {
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '—'
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric', month: 'long', day: 'numeric'
-  })
+  return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
-const sportLabel = (sport) =>
-  sport === 'basketball' ? '🏀 NBA' : '⚽ EPL'
-
-// ── Sub-components ────────────────────────────────────────────────────────────
+const sportLabel = (sport) => sport === 'basketball' ? '🏀 NBA' : '⚽ EPL'
 
 const StatPill = ({ label, value, accent = 'text-white' }) => (
-  <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 text-center">
-    <p className={`text-2xl font-bold ${accent}`}>{value}</p>
+  <div className="bg-gray-900 border border-gray-800 rounded-2xl p-3 sm:p-4 text-center">
+    <p className={`text-xl sm:text-2xl font-bold ${accent}`}>{value}</p>
     <p className="text-gray-500 text-xs mt-1">{label}</p>
   </div>
 )
 
 const LeagueCard = ({ league, userId, standings }) => {
-  const isCommissioner = league.commissioner?._id === userId ||
-                         league.commissioner === userId
-
-  const myEntry = standings?.find(s =>
-    s.owner?._id === userId || s.owner?.email === userId
-  )
-  const rank = myEntry?.rank ?? (standings?.findIndex(
-    s => s.owner?._id === userId || s.owner?.email === userId
-  ) + 1 || null)
+  const isCommissioner = league.commissioner?._id === userId || league.commissioner === userId
+  const myEntry = standings?.find(s => s.owner?._id === userId || s.owner?.email === userId)
+  const rank = myEntry?.rank ?? (standings?.findIndex(s => s.owner?._id === userId || s.owner?.email === userId) + 1 || null)
 
   return (
-    <div className="bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-2xl p-5 transition-all duration-200">
+    <div className="bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-2xl p-4 sm:p-5 transition-all duration-200">
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <p className="text-white font-semibold truncate">{league.name}</p>
             {isCommissioner && (
               <span className="text-xs bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1">
-                <FaCrown /> Commissioner
+                <FaCrown /> <span className="hidden sm:inline">Commissioner</span>
               </span>
             )}
           </div>
@@ -74,36 +58,27 @@ const LeagueCard = ({ league, userId, standings }) => {
         </span>
       </div>
 
-      <div className="flex items-center gap-4 mt-4">
+      <div className="flex items-center gap-3 sm:gap-4 mt-4 flex-wrap">
         <div className="flex items-center gap-1.5">
           <span className="text-gray-600 text-xs">Rank</span>
-          <span className="text-white font-bold text-sm">
-            {rank > 0 ? `#${rank}` : '—'}
-          </span>
+          <span className="text-white font-bold text-sm">{rank > 0 ? `#${rank}` : '—'}</span>
         </div>
-
         <div className="w-px h-4 bg-gray-800" />
-
         <div className="flex items-center gap-1.5">
           <span className="text-gray-600 text-xs">Members</span>
           <span className="text-white font-bold text-sm">{league.members?.length ?? 0}</span>
         </div>
-
         <div className="w-px h-4 bg-gray-800" />
-
         <div className={`flex items-center gap-1.5 text-xs ${league.isPrivate ? 'text-red-400' : 'text-green-400'}`}>
           {league.isPrivate ? <FaLock /> : <FaGlobe />}
           {league.isPrivate ? 'Private' : 'Public'}
         </div>
-
         {isCommissioner && league.inviteCode && (
           <>
-            <div className="w-px h-4 bg-gray-800" />
-            <div className="flex items-center gap-1.5">
+            <div className="w-px h-4 bg-gray-800 hidden sm:block" />
+            <div className="flex items-center gap-1.5 hidden sm:flex">
               <span className="text-gray-600 text-xs">Code</span>
-              <span className="text-green-400 font-mono font-bold text-xs tracking-widest">
-                {league.inviteCode}
-              </span>
+              <span className="text-green-400 font-mono font-bold text-xs tracking-widest">{league.inviteCode}</span>
             </div>
           </>
         )}
@@ -111,8 +86,6 @@ const LeagueCard = ({ league, userId, standings }) => {
     </div>
   )
 }
-
-// ── Main Page ─────────────────────────────────────────────────────────────────
 
 function UserProfile() {
   const { user, logout } = useAuth()
@@ -135,31 +108,19 @@ function UserProfile() {
     try {
       const res = await api.get('/leagues')
       setLeagues(res.data)
-
       const standingsMap = {}
-      await Promise.all(
-        res.data.map(async (league) => {
-          try {
-            const s = await api.get(`/leagues/${league._id}/standings`)
-            standingsMap[league._id] = s.data.standings || []
-          } catch {
-            standingsMap[league._id] = []
-          }
-        })
-      )
+      await Promise.all(res.data.map(async (league) => {
+        try {
+          const s = await api.get(`/leagues/${league._id}/standings`)
+          standingsMap[league._id] = s.data.standings || []
+        } catch { standingsMap[league._id] = [] }
+      }))
       setStandings(standingsMap)
-    } catch {
-      // silently fail
-    } finally {
-      setLoading(false)
-    }
+    } catch { } finally { setLoading(false) }
   }
 
   const handleSaveName = async () => {
-    if (!displayName.trim() || displayName === user?.username) {
-      setEditMode(false)
-      return
-    }
+    if (!displayName.trim() || displayName === user?.username) { setEditMode(false); return }
     setSaving(true)
     try {
       await api.put('/auth/me', { username: displayName.trim() })
@@ -169,15 +130,10 @@ function UserProfile() {
     } catch {
       setSaveMsg('Failed to update')
       setTimeout(() => setSaveMsg(''), 3000)
-    } finally {
-      setSaving(false)
-    }
+    } finally { setSaving(false) }
   }
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
+  const handleLogout = () => { logout(); navigate('/login') }
 
   const commissionerCount = leagues.filter(l =>
     l.commissioner?._id === user?._id || l.commissioner === user?._id
@@ -194,58 +150,46 @@ function UserProfile() {
     <div className="min-h-screen bg-gray-950 text-white flex flex-col">
       <Navbar />
 
-      <div className="flex-1 max-w-3xl mx-auto w-full px-6 py-8 space-y-6">
+      <div className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 space-y-5 sm:space-y-6">
 
         {/* ── Avatar + Identity ── */}
-        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-6">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-5 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5">
 
-            <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-2xl font-black text-white shrink-0 shadow-lg`}>
+            <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-xl sm:text-2xl font-black text-white shrink-0 shadow-lg`}>
               {getInitials(user?.username || user?.email)}
             </div>
 
-            <div className="flex-1 text-center sm:text-left">
+            <div className="flex-1 text-center sm:text-left w-full">
               {editMode ? (
-                <div className="flex items-center gap-2 justify-center sm:justify-start mb-1">
+                <div className="flex items-center gap-2 justify-center sm:justify-start mb-1 flex-wrap">
                   <input
                     value={displayName}
                     onChange={e => setDisplayName(e.target.value)}
-                    className="bg-gray-800 border border-gray-600 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-green-500 transition"
+                    className="bg-gray-800 border border-gray-600 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-green-500 transition flex-1 min-w-0 max-w-xs"
                     autoFocus
                   />
-                  <button
-                    onClick={handleSaveName}
-                    disabled={saving}
-                    className="text-xs bg-green-500 hover:bg-green-400 text-gray-950 font-bold px-3 py-1.5 rounded-lg transition disabled:opacity-50"
-                  >
+                  <button onClick={handleSaveName} disabled={saving}
+                    className="text-xs bg-green-500 hover:bg-green-400 text-gray-950 font-bold px-3 py-1.5 rounded-lg transition disabled:opacity-50">
                     {saving ? '...' : 'Save'}
                   </button>
-                  <button
-                    onClick={() => { setEditMode(false); setDisplayName(user?.username || '') }}
-                    className="text-xs text-gray-500 hover:text-gray-300 transition"
-                  >
+                  <button onClick={() => { setEditMode(false); setDisplayName(user?.username || '') }}
+                    className="text-xs text-gray-500 hover:text-gray-300 transition">
                     Cancel
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 justify-center sm:justify-start mb-1">
-                  <h1 className="text-xl font-bold text-white">
+                  <h1 className="text-lg sm:text-xl font-bold text-white">
                     {user?.username || user?.email?.split('@')[0]}
                   </h1>
-                  <button
-                    onClick={() => setEditMode(true)}
-                    className="text-gray-600 hover:text-gray-400 transition text-sm"
-                    title="Edit name"
-                  >
+                  <button onClick={() => setEditMode(true)} className="text-gray-600 hover:text-gray-400 transition text-sm" title="Edit name">
                     <FaEdit />
                   </button>
                 </div>
               )}
 
-              {saveMsg && (
-                <p className="text-green-400 text-xs mb-1">{saveMsg}</p>
-              )}
-
+              {saveMsg && <p className="text-green-400 text-xs mb-1">{saveMsg}</p>}
               <p className="text-gray-400 text-sm">{user?.email}</p>
 
               <div className="flex items-center gap-2 justify-center sm:justify-start mt-2 flex-wrap">
@@ -257,24 +201,19 @@ function UserProfile() {
                   {user?.role === 'admin' ? <FaCog /> : <FaMedal />}
                   {user?.role === 'admin' ? 'Admin' : 'Member'}
                 </span>
-
-                <span className="text-xs text-gray-600">
-                  Joined {formatDate(user?.createdAt)}
-                </span>
+                <span className="text-xs text-gray-600">Joined {formatDate(user?.createdAt)}</span>
               </div>
             </div>
 
-            <button
-              onClick={handleLogout}
-              className="shrink-0 text-xs text-gray-500 hover:text-red-400 border border-gray-800 hover:border-red-500/30 px-4 py-2 rounded-xl transition"
-            >
+            <button onClick={handleLogout}
+              className="shrink-0 text-xs text-gray-500 hover:text-red-400 border border-gray-800 hover:border-red-500/30 px-4 py-2 rounded-xl transition self-start">
               Sign out
             </button>
           </div>
         </div>
 
         {/* ── Stats row ── */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <StatPill label="Leagues"      value={leagues.length}    accent="text-white" />
           <StatPill label="Commissioner" value={commissionerCount} accent="text-yellow-400" />
           <StatPill label="Total Points" value={totalPoints}       accent="text-green-400" />
@@ -284,10 +223,7 @@ function UserProfile() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-white font-semibold text-base">My Leagues</h2>
-            <button
-              onClick={() => navigate('/leagues')}
-              className="text-green-400 text-sm hover:text-green-300 transition"
-            >
+            <button onClick={() => navigate('/leagues')} className="text-green-400 text-sm hover:text-green-300 transition">
               Manage →
             </button>
           </div>
@@ -305,22 +241,15 @@ function UserProfile() {
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
               <p className="text-4xl mb-3"><FaFutbol /></p>
               <p className="text-gray-400 text-sm">You haven't joined any leagues yet</p>
-              <button
-                onClick={() => navigate('/leagues')}
-                className="mt-4 bg-green-500 hover:bg-green-400 text-gray-950 font-bold px-6 py-2 rounded-xl transition text-sm"
-              >
+              <button onClick={() => navigate('/leagues')}
+                className="mt-4 bg-green-500 hover:bg-green-400 text-gray-950 font-bold px-6 py-2 rounded-xl transition text-sm">
                 Browse Leagues
               </button>
             </div>
           ) : (
             <div className="space-y-3">
               {leagues.map(league => (
-                <LeagueCard
-                  key={league._id}
-                  league={league}
-                  userId={user?._id}
-                  standings={standings[league._id]}
-                />
+                <LeagueCard key={league._id} league={league} userId={user?._id} standings={standings[league._id]} />
               ))}
             </div>
           )}
@@ -328,24 +257,19 @@ function UserProfile() {
 
         {/* ── Quick actions ── */}
         <div className="grid grid-cols-2 gap-3 pb-4">
-          <button
-            onClick={() => navigate('/')}
-            className="bg-gray-900 border border-gray-800 hover:border-green-500 rounded-2xl p-4 text-left transition"
-          >
+          <button onClick={() => navigate('/')}
+            className="bg-gray-900 border border-gray-800 hover:border-green-500 rounded-2xl p-4 text-left transition">
             <div className="text-2xl mb-1"><FaHome /></div>
             <p className="text-sm font-medium text-white">Dashboard</p>
           </button>
-          <button
-            onClick={() => navigate('/standings')}
-            className="bg-gray-900 border border-gray-800 hover:border-green-500 rounded-2xl p-4 text-left transition"
-          >
+          <button onClick={() => navigate('/standings')}
+            className="bg-gray-900 border border-gray-800 hover:border-green-500 rounded-2xl p-4 text-left transition">
             <div className="text-2xl mb-1"><FaChartBar /></div>
             <p className="text-sm font-medium text-white">Standings</p>
           </button>
         </div>
 
       </div>
-
       <Footer />
     </div>
   )
