@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import api from '../api/axios'
+import { FaFutbol, FaBasketballBall, FaFootballBall, FaTrophy, FaLock } from 'react-icons/fa'
 
 export default function LeagueDetail() {
   const { id } = useParams()
