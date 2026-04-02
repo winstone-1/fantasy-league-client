@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { FaTrophy } from 'react-icons/fa'
 
 function Navbar() {
   const navigate  = useNavigate()
@@ -27,7 +28,7 @@ function Navbar() {
         className="flex items-center gap-2 cursor-pointer"
         onClick={() => navigate('/')}
       >
-        <span className="text-green-400 text-2xl">🏆</span>
+        <span className="text-green-400 text-2xl"><FaTrophy /></span>
         <span className="text-green-400 font-bold text-xl">FantasySports</span>
       </div>
 

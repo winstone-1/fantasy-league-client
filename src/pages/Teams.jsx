@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import api from '../api/axios'
+import { FaBasketballBall, FaFutbol } from 'react-icons/fa'
 
 // ── Soccer formations ──────────────────────────────────────
 const FORMATIONS = {
@@ -86,7 +87,7 @@ function PlayerSlot({ position, player, sport, onDragOver, onDrop, onDragStart, 
                 onError={e => { e.target.style.display = 'none' }}
               />
             ) : (
-              <span className="text-xl">{sport === 'basketball' ? '🏀' : '⚽'}</span>
+              <span className="text-xl">{sport === 'basketball' ? <FaBasketballBall /> : <FaFutbol />}</span>
             )}
             <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-gray-950">
               <span className="text-[10px] text-gray-950 font-bold italic">✓</span>
@@ -266,7 +267,7 @@ export default function Teams() {
       await api.put(`/leagues/${currentTeam.leagueId}/teams/${currentTeam._id}`, {
         players: roster
       });
-      alert("Team saved successfully! ⚽🏀");
+      alert("Team saved successfully!");
     } catch (err) {
       console.error(err);
       alert("Failed to save team.");
@@ -310,20 +311,20 @@ export default function Teams() {
               onClick={() => setSport('soccer')} 
               className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${sport === 'soccer' ? 'bg-green-500 text-gray-950 shadow-lg shadow-green-500/20' : 'text-gray-400 hover:text-white'}`}
             >
-              ⚽ Soccer
+              <FaFutbol /> Soccer
             </button>
             <button 
               onClick={() => setSport('basketball')} 
               className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${sport === 'basketball' ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/20' : 'text-gray-400 hover:text-white'}`}
             >
-              🏀 NBA
+              <FaBasketballBall /> NBA
             </button>
           </div>
         </div>
 
         {!currentTeam && !loading ? (
           <div className="bg-gray-900 border border-gray-800 rounded-[2rem] p-16 text-center shadow-2xl">
-            <div className="text-7xl mb-6 opacity-80 animate-bounce">{sport === 'soccer' ? '⚽' : '🏀'}</div>
+            <div className="text-7xl mb-6 opacity-80 animate-bounce">{sport === 'soccer' ? <FaFutbol /> : <FaBasketballBall />}</div>
             <h2 className="text-2xl font-bold mb-3">No {sport} team detected</h2>
             <p className="text-gray-400 max-w-sm mx-auto mb-8">You haven't initialized a squad for this sport yet. Let's get your first team on the field!</p>
             <button onClick={handleCreateTeam} className="bg-white text-gray-950 font-black px-10 py-4 rounded-2xl hover:scale-105 active:scale-95 transition shadow-xl">Initialize Team</button>

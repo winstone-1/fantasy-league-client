@@ -4,13 +4,14 @@ import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { FaFutbol, FaBasketballBall, FaChartBar, FaMedal } from 'react-icons/fa'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 const getRankBadge = (rank) => {
-  if (rank === 1) return { bg: 'bg-yellow-500',  label: '🥇' }
-  if (rank === 2) return { bg: 'bg-gray-400',    label: '🥈' }
-  if (rank === 3) return { bg: 'bg-amber-600',   label: '🥉' }
+  if (rank === 1) return { bg: 'bg-yellow-500',  label: <FaMedal className="text-white" /> }
+  if (rank === 2) return { bg: 'bg-gray-400',    label: <FaMedal className="text-white" /> }
+  if (rank === 3) return { bg: 'bg-amber-600',   label: <FaMedal className="text-white" /> }
   return           { bg: 'bg-gray-700',           label: rank  }
 }
 
@@ -154,7 +155,7 @@ function Standings() {
             {/* Sport badge */}
             {league && (
               <span className="text-xs bg-green-500/10 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-full shrink-0">
-                {league.sport === 'soccer' ? '⚽ EPL' : '🏀 NBA'}
+                {league.sport === 'soccer' ? <FaFutbol className="inline mr-1" /> : <FaBasketballBall className="inline mr-1" />}{league.sport === 'soccer' ? 'EPL' : 'NBA'}
               </span>
             )}
 
@@ -184,7 +185,7 @@ function Standings() {
         {/* ── Empty state ── */}
         {!loading && !league && (
           <div className="text-center py-20">
-            <div className="text-5xl mb-4">📊</div>
+            <div className="text-5xl mb-4"><FaChartBar /></div>
             <p className="text-gray-400 text-lg">You're not in any league yet</p>
             <button
               onClick={() => navigate('/')}

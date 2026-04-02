@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import api from '../api/axios'
+import { FaCrown, FaLock, FaGlobe, FaEdit, FaCog, FaMedal, FaStadium, FaHome, FaChartBar } from 'react-icons/fa'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -29,11 +30,6 @@ const formatDate = (dateStr) => {
   return new Date(dateStr).toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric'
   })
-}
-
-const sportLabel = (sport) => {
-  const map = { soccer: '⚽ EPL', basketball: '🏀 NBA', football: '🏈 NFL', baseball: '⚾ MLB' }
-  return map[sport] || sport
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -62,8 +58,8 @@ const LeagueCard = ({ league, userId, standings }) => {
           <div className="flex items-center gap-2 flex-wrap">
             <p className="text-white font-semibold truncate">{league.name}</p>
             {isCommissioner && (
-              <span className="text-xs bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2 py-0.5 rounded-full shrink-0">
-                👑 Commissioner
+              <span className="text-xs bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1">
+                <FaCrown /> Commissioner
               </span>
             )}
           </div>
@@ -94,10 +90,9 @@ const LeagueCard = ({ league, userId, standings }) => {
         <div className="w-px h-4 bg-gray-800" />
 
         {/* Privacy */}
-        <div className="flex items-center gap-1.5">
-          <span className={`text-xs ${league.isPrivate ? 'text-red-400' : 'text-green-400'}`}>
-            {league.isPrivate ? '🔒 Private' : '🌐 Public'}
-          </span>
+        <div className={`flex items-center gap-1.5 text-xs ${league.isPrivate ? 'text-red-400' : 'text-green-400'}`}>
+          {league.isPrivate ? <FaLock /> : <FaGlobe />}
+          {league.isPrivate ? 'Private' : 'Public'}
         </div>
 
         {/* Invite code — only shown to commissioner */}
@@ -246,7 +241,7 @@ function UserProfile() {
                     className="text-gray-600 hover:text-gray-400 transition text-sm"
                     title="Edit name"
                   >
-                    ✏️
+                    <FaEdit />
                   </button>
                 </div>
               )}
@@ -259,12 +254,13 @@ function UserProfile() {
 
               <div className="flex items-center gap-2 justify-center sm:justify-start mt-2 flex-wrap">
                 {/* Role badge */}
-                <span className={`text-xs px-2.5 py-1 rounded-full border font-semibold ${
+                <span className={`text-xs px-2.5 py-1 rounded-full border font-semibold flex items-center gap-1 ${
                   user?.role === 'admin'
                     ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
                     : 'bg-green-500/10 text-green-400 border-green-500/20'
                 }`}>
-                  {user?.role === 'admin' ? '⚙️ Admin' : '🏅 Member'}
+                  {user?.role === 'admin' ? <FaCog /> : <FaMedal />}
+                  {user?.role === 'admin' ? 'Admin' : 'Member'}
                 </span>
 
                 {/* Joined date */}
@@ -314,7 +310,7 @@ function UserProfile() {
             </div>
           ) : leagues.length === 0 ? (
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
-              <p className="text-4xl mb-3">🏟️</p>
+              <p className="text-4xl mb-3"><FaStadium /></p>
               <p className="text-gray-400 text-sm">You haven't joined any leagues yet</p>
               <button
                 onClick={() => navigate('/leagues')}
@@ -343,14 +339,14 @@ function UserProfile() {
             onClick={() => navigate('/dashboard')}
             className="bg-gray-900 border border-gray-800 hover:border-green-500 rounded-2xl p-4 text-left transition"
           >
-            <div className="text-2xl mb-1">🏠</div>
+            <div className="text-2xl mb-1"><FaHome /></div>
             <p className="text-sm font-medium text-white">Dashboard</p>
           </button>
           <button
             onClick={() => navigate('/standings')}
             className="bg-gray-900 border border-gray-800 hover:border-green-500 rounded-2xl p-4 text-left transition"
           >
-            <div className="text-2xl mb-1">📊</div>
+            <div className="text-2xl mb-1"><FaChartBar /></div>
             <p className="text-sm font-medium text-white">Standings</p>
           </button>
         </div>

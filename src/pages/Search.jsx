@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import api from '../api/axios'
+import { FaBasketballBall, FaFutbol } from 'react-icons/fa'
 
 
 function Search() {
@@ -109,14 +110,19 @@ function Search() {
                 className={`px-5 py-2 rounded-lg text-sm font-medium transition ${
                   sport === 'basketball' ? 'bg-green-500 text-gray-950' : 'text-gray-400 hover:text-white'
                 }`}
-              >🏀 NBA</button>
+              >
+                {sport === 'basketball' ? <FaBasketballBall className="inline mr-1" /> : <FaFutbol className="inline mr-1" />}
+                {sport === 'basketball' ? 'NBA' : 'EPL'}
+              </button>
               <button
                 type="button"
                 onClick={() => setSport('soccer')}
                 className={`px-5 py-2 rounded-lg text-sm font-medium transition ${
                   sport === 'soccer' ? 'bg-green-500 text-gray-950' : 'text-gray-400 hover:text-white'
                 }`}
-              >⚽ EPL</button>
+              >
+                {sport === 'soccer' ? <FaFutbol className="inline mr-1" /> : <FaBasketballBall className="inline mr-1" />}
+                {sport === 'soccer' ? 'EPL' : 'NBA'}</button>
             </div>
 
             <div className="flex flex-1 gap-3">
@@ -163,7 +169,7 @@ function Search() {
         {/* Default state */}
         {!loading && !searched && (
           <div className="text-center py-20">
-            <div className="text-5xl mb-4">{sport === 'basketball' ? '🏀' : '⚽'}</div>
+            <div className="text-5xl mb-4">{sport === 'basketball' ? <FaBasketballBall /> : <FaFutbol />}</div>
             <p className="text-gray-400 text-lg">Search for your favourite players</p>
             <p className="text-gray-600 text-sm mt-1">
               {sport === 'basketball' ? 'Try LeBron, Curry, Durant...' : 'Try Salah, Haaland, De Bruyne...'}
@@ -195,10 +201,10 @@ function Search() {
                       className="w-16 h-16 rounded-full bg-gray-800 border-2 border-gray-700 items-center justify-center text-2xl"
                       style={{ display: player.photo ? 'none' : 'flex' }}
                     >
-                      {sport === 'basketball' ? '🏀' : '⚽'}
+                      {sport === 'basketball' ? <FaBasketballBall /> : <FaFutbol />}
                     </div>
                     <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gray-950 flex items-center justify-center text-xs">
-                      {sport === 'basketball' ? '🏀' : '⚽'}
+                      {sport === 'basketball' ? <FaBasketballBall /> : <FaFutbol />}
                     </div>
                   </div>
 

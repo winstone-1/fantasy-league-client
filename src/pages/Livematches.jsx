@@ -40,7 +40,7 @@ const getStatusPill = (status, minute, sport) => {
 }
 
 const sportIcon = (sport) =>
-  sport === 'basketball' ? '🏀' : '⚽'
+  sport === 'basketball' ? <FaBasketballBall /> : <FaFutbol />
 
 const teamInitials = (name = '') =>
   name.slice(0, 3).toUpperCase()
@@ -332,7 +332,7 @@ function LiveMatches() {
         {/* ── No matches ── */}
         {!loading && matches.length === 0 && !error && (
           <div className="text-center py-24">
-            <div className="text-5xl mb-4">🏟️</div>
+            <div className="text-5xl mb-4"><FaStadium /></div>
             <p className="text-gray-400 text-lg font-medium">No live matches right now</p>
             <p className="text-gray-600 text-sm mt-1">Check back when your gameweek starts</p>
           </div>

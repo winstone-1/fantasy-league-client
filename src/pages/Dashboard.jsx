@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import api from '../api/axios'
 import Footer from '../components/Footer'
+import { FaTrophy, FaHandSparkles, FaFutbol } from 'react-icons/fa'
 
 function Dashboard() {
   const { user } = useAuth()
@@ -66,15 +67,15 @@ function Dashboard() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold">
-              Welcome back, {user?.username || user?.email?.split('@')[0]} 👋
+              Welcome back, {user?.username || user?.email?.split('@')[0]} <FaHandSparkles className="inline ml-1" />
             </h1>
             <p className="text-gray-400 text-sm mt-1">
               {league ? `${league.name} · Season ${league.season}` : 'No league yet'}
             </p>
           </div>
           {league && (
-            <span className="text-sm bg-gray-900 border border-gray-800 px-4 py-2 rounded-xl text-gray-300">
-              {sports[league.sport] || '🏆'} {league.sport === 'soccer' ? 'Premier League' : 'NBA'}
+            <span className="text-sm bg-gray-900 border border-gray-800 px-4 py-2 rounded-xl text-gray-300 flex items-center gap-1">
+              {sports[league.sport] ? (league.sport === 'soccer' ? <FaTrophy /> : <FaTrophy />) : <FaTrophy />} {league.sport === 'soccer' ? 'Premier League' : 'NBA'}
             </span>
           )}
         </div>
@@ -180,8 +181,8 @@ function Dashboard() {
                         {player.photo ? (
                           <img src={player.photo} alt={player.name} className="w-14 h-14 rounded-full object-cover border-2 border-gray-700" onError={e => e.target.style.display = 'none'}/>
                         ) : (
-                          <div className="w-14 h-14 rounded-full bg-gray-700 flex items-center justify-center text-xl">⚽</div>
-                        )}
+                          <div className="w-14 h-14 rounded-full bg-gray-700 flex items-center justify-center text-xl"><FaFutbol /></div>
+                        )}  
                       </div>
                       <p className="font-semibold text-xs text-white leading-tight">{player.name}</p>
                       <p className="text-gray-400 text-xs mt-0.5">{player.team?.slice(0, 3).toUpperCase() || '???'} · {player.position || 'MID'}</p>

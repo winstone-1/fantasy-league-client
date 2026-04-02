@@ -62,7 +62,7 @@ export default function LeagueDetail() {
   const isCommissioner = league?.commissioner?._id === user?._id ||
     league?.commissioner?.email === user?.email
 
-  const sports = { soccer: '⚽', basketball: '🏀', football: '🏈' }
+  const sports = { soccer: <FaFutbol />, basketball: <FaBasketballBall />, football: <FaFootballBall /> }
 
   const getRankStyle = (rank) => {
     if (rank === 1) return 'bg-yellow-500 text-white'
@@ -98,7 +98,7 @@ export default function LeagueDetail() {
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-gray-800 flex items-center justify-center text-3xl">
-                {sports[league?.sport] || '🏆'}
+                {sports[league?.sport] || <FaTrophy />}
               </div>
               <div>
                 <h1 className="text-2xl font-bold">{league?.name}</h1>
@@ -112,8 +112,8 @@ export default function LeagueDetail() {
                     </span>
                   )}
                   {league?.isPrivate && (
-                    <span className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full">
-                      🔒 Private
+                    <span className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <FaLock /> Private
                     </span>
                   )}
                 </div>

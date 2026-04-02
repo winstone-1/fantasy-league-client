@@ -4,6 +4,7 @@ import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { FaFutbol, FaBasketballBall, FaCrown } from 'react-icons/fa'
 
 function League() {
   const [leagues, setLeagues]         = useState([])
@@ -251,7 +252,7 @@ function League() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center text-2xl">
-                      {league.sport === 'soccer' ? '⚽' : '🏀'}
+                      {league.sport === 'soccer' ? <FaFutbol /> : <FaBasketballBall />}
                     </div>
                     <div>
                       <h3 className="font-semibold text-white">{league.name}</h3>
@@ -262,8 +263,8 @@ function League() {
                   </div>
                   <div className="flex items-center gap-3">
                     {league.commissioner?._id === user?._id && (
-                      <span className="text-xs bg-green-500/10 text-green-400 border border-green-500/30 px-2 py-1 rounded-full">
-                        Commissioner
+                      <span className="text-xs bg-green-500/10 text-green-400 border border-green-500/30 px-2 py-1 rounded-full flex items-center gap-1">
+                        <FaCrown /> Commissioner
                       </span>
                     )}
                     <div className="text-right">
