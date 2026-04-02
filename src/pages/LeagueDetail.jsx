@@ -202,7 +202,7 @@ export default function LeagueDetail() {
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              {tab === 'overview' ? '🏟️ Overview' : tab === 'standings' ? '📊 Standings' : '⚡ Matches'}
+              {tab === 'overview' ? 'Overview' : tab === 'standings' ? 'Standings' : 'Matches'}
             </button>
           ))}
         </div>

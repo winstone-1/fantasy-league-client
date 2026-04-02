@@ -135,8 +135,8 @@ function League() {
                     onChange={e => setForm({ ...form, sport: e.target.value })}
                     className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition"
                   >
-                    <option value="soccer">⚽ Soccer / EPL</option>
-                    <option value="basketball">🏀 Basketball / NBA</option>
+                    <option value="soccer"> Soccer / EPL</option>
+                    <option value="basketball"> Basketball / NBA</option>
                   </select>
                 </div>
                 <div>
@@ -234,7 +234,7 @@ function League() {
 
         {!loading && leagues.length === 0 && !showCreate && !showJoin && (
           <div className="text-center py-20">
-            <div className="text-5xl mb-4">🏟️</div>
+            <div className="text-5xl mb-4"></div>
             <p className="text-gray-400 text-lg">You're not in any leagues yet</p>
             <p className="text-gray-600 text-sm mt-1">Create one or join with an invite code</p>
           </div>

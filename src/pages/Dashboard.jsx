@@ -203,10 +203,10 @@ function Dashboard() {
             {/* Quick actions */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: 'My Leagues', icon: '🏟️', path: '/leagues' },
-                { label: 'Search Players', icon: '🔍', path: '/search' },
-                { label: 'Standings', icon: '📊', path: '/standings' },
-                { label: 'Live Matches', icon: '⚡', path: '/matches' },
+                { label: 'My Leagues', path: '/leagues' },
+                { label: 'Search Players',  path: '/search' },
+                { label: 'Standings',  path: '/standings' },
+                { label: 'Live Matches', path: '/matches' },
               ].map(action => (
                 <button key={action.path} onClick={() => navigate(action.path)} className="bg-gray-900 border border-gray-800 rounded-2xl p-4 hover:border-green-500 transition text-left">
                   <div className="text-2xl mb-2">{action.icon}</div>

@@ -4,7 +4,7 @@ function NotFound() {
   const navigate = useNavigate()
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center">
-      <div className="text-8xl mb-6">🏟️</div>
+      
       <h1 className="text-4xl font-bold mb-2">404</h1>
       <p className="text-gray-400 mb-8">This page doesn't exist</p>
       <button
