@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import api from '../api/axios'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { FaFutbol, FaBasketballBall, FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaPlay, FaStop, FaClock, FaMapMarkerAlt } from 'react-icons/fa'
+import { FaFutbol, FaBasketballBall, FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaPlay, FaMapMarkerAlt } from 'react-icons/fa'
 
 export default function MatchManagement() {
   const { user } = useAuth()
@@ -23,6 +23,7 @@ export default function MatchManagement() {
     awayTeam: '',
     date: '',
     time: '',
+    week: 1,
     venue: '',
     status: 'scheduled'
   })
@@ -32,7 +33,6 @@ export default function MatchManagement() {
     minute: 0
   })
 
-  // Check if user is commissioner
   useEffect(() => {
     checkCommissionerStatus()
   }, [user])
@@ -40,22 +40,20 @@ export default function MatchManagement() {
   const checkCommissionerStatus = async () => {
     try {
       const res = await api.get('/leagues')
-      const userLeagues = res.data.filter(league => 
+      const userLeagues = res.data.filter(league =>
         league.commissioner?._id === user?._id
       )
-      
+
       if (userLeagues.length === 0) {
         alert('You are not a commissioner of any league')
         navigate('/leagues')
         return
       }
-      
+
       setLeagues(userLeagues)
-      if (userLeagues.length > 0) {
-        setSelectedLeague(userLeagues[0])
-        await fetchTeams(userLeagues[0]._id)
-        await fetchMatches(userLeagues[0]._id)
-      }
+      setSelectedLeague(userLeagues[0])
+      await fetchTeams(userLeagues[0]._id)
+      await fetchMatches(userLeagues[0]._id)
       setLoading(false)
     } catch (err) {
       console.error(err)
@@ -96,6 +94,7 @@ export default function MatchManagement() {
       awayTeam: '',
       date: new Date().toISOString().split('T')[0],
       time: '19:00',
+      week: 1,
       venue: '',
       status: 'scheduled'
     })
@@ -109,6 +108,7 @@ export default function MatchManagement() {
       awayTeam: match.awayTeam._id || match.awayTeam,
       date: match.date?.split('T')[0] || new Date().toISOString().split('T')[0],
       time: match.time || '19:00',
+      week: match.week || 1,
       venue: match.venue || '',
       status: match.status || 'scheduled'
     })
@@ -117,7 +117,6 @@ export default function MatchManagement() {
 
   const handleDeleteMatch = async (matchId) => {
     if (!window.confirm('Are you sure you want to delete this match?')) return
-    
     try {
       await api.delete(`/leagues/${selectedLeague._id}/matches/${matchId}`)
       await fetchMatches(selectedLeague._id)
@@ -130,7 +129,7 @@ export default function MatchManagement() {
 
   const handleSubmitMatch = async (e) => {
     e.preventDefault()
-    
+
     if (!formData.homeTeam || !formData.awayTeam) {
       alert('Please select both teams')
       return
@@ -141,11 +140,16 @@ export default function MatchManagement() {
       return
     }
 
+    // Combine date + time into startTime
+    const startTime = new Date(`${formData.date}T${formData.time}:00`).toISOString()
+
     const matchData = {
       homeTeam: formData.homeTeam,
       awayTeam: formData.awayTeam,
       date: formData.date,
       time: formData.time,
+      startTime,
+      week: Number(formData.week),
       venue: formData.venue,
       status: formData.status
     }
@@ -158,7 +162,7 @@ export default function MatchManagement() {
         await api.post(`/leagues/${selectedLeague._id}/matches`, matchData)
         alert('Match created successfully')
       }
-      
+
       setShowModal(false)
       await fetchMatches(selectedLeague._id)
     } catch (err) {
@@ -169,22 +173,20 @@ export default function MatchManagement() {
 
   const handleUpdateScore = async (e) => {
     e.preventDefault()
-    
     try {
       await api.put(`/matches/${selectedMatchForScore._id}/score`, {
         homeScore: scoreData.homeScore,
         awayScore: scoreData.awayScore,
         minute: scoreData.minute
       })
-      
-      // Also update status to live if it's not already
+
       if (selectedMatchForScore.status !== 'live') {
         await api.patch(`/matches/${selectedMatchForScore._id}/status`, {
           status: 'live',
           minute: scoreData.minute
         })
       }
-      
+
       alert('Score updated successfully')
       setShowScoreModal(false)
       await fetchMatches(selectedLeague._id)
@@ -196,10 +198,7 @@ export default function MatchManagement() {
 
   const handleMatchStatus = async (matchId, status, minute = null) => {
     try {
-      await api.patch(`/matches/${matchId}/status`, {
-        status,
-        minute
-      })
+      await api.patch(`/matches/${matchId}/status`, { status, minute })
       await fetchMatches(selectedLeague._id)
       alert(`Match marked as ${status}`)
     } catch (err) {
@@ -220,11 +219,11 @@ export default function MatchManagement() {
 
   const getStatusBadge = (status) => {
     const statuses = {
-      'scheduled': 'bg-gray-600',
-      'live': 'bg-green-500 animate-pulse',
-      'ht': 'bg-yellow-600',
-      'ft': 'bg-blue-600',
-      'cancelled': 'bg-red-600'
+      scheduled: 'bg-gray-600',
+      live: 'bg-green-500 animate-pulse',
+      ht: 'bg-yellow-600',
+      ft: 'bg-blue-600',
+      cancelled: 'bg-red-600'
     }
     return statuses[status] || 'bg-gray-600'
   }
@@ -235,7 +234,7 @@ export default function MatchManagement() {
         <Navbar />
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto" />
             <p className="mt-4 text-gray-400">Loading...</p>
           </div>
         </div>
@@ -246,7 +245,7 @@ export default function MatchManagement() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -285,10 +284,7 @@ export default function MatchManagement() {
           {matches.length === 0 ? (
             <div className="text-center py-16 bg-gray-900/50 rounded-3xl">
               <p className="text-gray-400">No matches scheduled yet</p>
-              <button
-                onClick={handleCreateMatch}
-                className="mt-4 text-green-500 hover:text-green-400"
-              >
+              <button onClick={handleCreateMatch} className="mt-4 text-green-500 hover:text-green-400">
                 Create your first match →
               </button>
             </div>
@@ -296,7 +292,6 @@ export default function MatchManagement() {
             matches.map(match => (
               <div key={match._id} className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
                 <div className="p-5">
-                  {/* Match Header */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">
@@ -305,10 +300,11 @@ export default function MatchManagement() {
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(match.status)}`}>
                         {match.status?.toUpperCase()}
                       </span>
+                      {match.week && (
+                        <span className="text-gray-500 text-xs">GW{match.week}</span>
+                      )}
                       {match.minute > 0 && (
-                        <span className="text-yellow-500 text-sm font-mono">
-                          {match.minute}'
-                        </span>
+                        <span className="text-yellow-500 text-sm font-mono">{match.minute}'</span>
                       )}
                     </div>
                     <div className="text-sm text-gray-500">
@@ -316,7 +312,6 @@ export default function MatchManagement() {
                     </div>
                   </div>
 
-                  {/* Match Score */}
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex-1 text-center">
                       <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -325,9 +320,9 @@ export default function MatchManagement() {
                       <p className="font-semibold">{match.homeTeam?.name || 'TBD'}</p>
                       <p className="text-3xl font-bold mt-2">{match.homeScore ?? 0}</p>
                     </div>
-                    
+
                     <div className="text-2xl font-black text-gray-600 px-4">VS</div>
-                    
+
                     <div className="flex-1 text-center">
                       <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-2">
                         <span className="text-xl font-bold">{match.awayTeam?.name?.[0] || '?'}</span>
@@ -337,14 +332,12 @@ export default function MatchManagement() {
                     </div>
                   </div>
 
-                  {/* Venue */}
                   {match.venue && (
                     <p className="text-sm text-gray-500 text-center mb-4 flex items-center justify-center gap-1">
                       <FaMapMarkerAlt /> {match.venue}
                     </p>
                   )}
 
-                  {/* Actions */}
                   <div className="flex gap-2 justify-end border-t border-gray-800 pt-4">
                     {match.status === 'scheduled' && (
                       <button
@@ -354,7 +347,7 @@ export default function MatchManagement() {
                         <FaPlay className="text-xs" /> Start Match
                       </button>
                     )}
-                    
+
                     {match.status === 'live' && (
                       <>
                         <button
@@ -371,21 +364,21 @@ export default function MatchManagement() {
                         </button>
                       </>
                     )}
-                    
+
                     <button
                       onClick={() => openScoreModal(match)}
                       className="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-semibold flex items-center gap-2"
                     >
-                      <FaSave className="text-xs" /> Update Score
+                      <FaSave /> Update Score
                     </button>
-                    
+
                     <button
                       onClick={() => handleEditMatch(match)}
                       className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-semibold"
                     >
                       <FaEdit />
                     </button>
-                    
+
                     <button
                       onClick={() => handleDeleteMatch(match._id)}
                       className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-sm font-semibold"
@@ -412,7 +405,7 @@ export default function MatchManagement() {
                 <FaTimes />
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmitMatch} className="space-y-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Home Team</label>
@@ -428,7 +421,7 @@ export default function MatchManagement() {
                   ))}
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Away Team</label>
                 <select
@@ -443,18 +436,32 @@ export default function MatchManagement() {
                   ))}
                 </select>
               </div>
-              
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Date</label>
-                <input
-                  type="date"
-                  required
-                  value={formData.date}
-                  onChange={(e) => setFormData({...formData, date: e.target.value})}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
-                />
+
+              {/* Week + Date side by side */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Gameweek</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={formData.week}
+                    onChange={(e) => setFormData({...formData, week: e.target.value})}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-400 mb-1">Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={formData.date}
+                    onChange={(e) => setFormData({...formData, date: e.target.value})}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
+                  />
+                </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Time</label>
                 <input
@@ -465,7 +472,7 @@ export default function MatchManagement() {
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Venue (Optional)</label>
                 <input
@@ -476,7 +483,7 @@ export default function MatchManagement() {
                   placeholder="Stadium name"
                 />
               </div>
-              
+
               <button
                 type="submit"
                 className="w-full bg-green-600 hover:bg-green-500 py-3 rounded-xl font-semibold mt-4"
@@ -498,13 +505,13 @@ export default function MatchManagement() {
                 <FaTimes />
               </button>
             </div>
-            
+
             <div className="mb-4 text-center">
               <p className="text-sm text-gray-400">
                 {selectedMatchForScore.homeTeam?.name} vs {selectedMatchForScore.awayTeam?.name}
               </p>
             </div>
-            
+
             <form onSubmit={handleUpdateScore} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -518,7 +525,6 @@ export default function MatchManagement() {
                     className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white text-center text-2xl"
                   />
                 </div>
-                
                 <div>
                   <label className="block text-sm text-gray-400 mb-1">Away Score</label>
                   <input
@@ -531,7 +537,7 @@ export default function MatchManagement() {
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Minute (for live matches)</label>
                 <input
@@ -543,7 +549,7 @@ export default function MatchManagement() {
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white"
                 />
               </div>
-              
+
               <button
                 type="submit"
                 className="w-full bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-semibold mt-4"
@@ -554,7 +560,7 @@ export default function MatchManagement() {
           </div>
         </div>
       )}
-      
+
       <Footer />
     </div>
   )
