@@ -50,22 +50,19 @@ function League() {
     }
   }
 
-  const handleJoin = async (e) => {
-    e.preventDefault()
-    setError('')
-    try {
-      const res = await api.get('/leagues')
-      const allLeagues = res.data
-      const target = allLeagues.find(l => l.inviteCode === inviteCode.toUpperCase())
-      if (!target) return setError('Invalid invite code')
-      await api.post(`/leagues/${target._id}/join`, { inviteCode })
-      setSuccess('Joined league!')
-      setShowJoin(false)
-      fetchLeagues()
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to join league')
-    }
+ const handleJoin = async (e) => {
+  e.preventDefault()
+  setError('')
+  try {
+    await api.post('/leagues/join', { inviteCode: inviteCode.trim().toUpperCase() })
+    setSuccess('Joined league!')
+    setShowJoin(false)
+    setInviteCode('')
+    fetchLeagues()
+  } catch (err) {
+    setError(err.response?.data?.message || 'Invalid invite code')
   }
+}
 
   return (
    
