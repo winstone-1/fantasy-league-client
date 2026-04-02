@@ -54,7 +54,7 @@ function Dashboard() {
   const liveMatch    = matches.find(m => m.status === 'live')
   const upcomingMatch = matches.find(m => m.status === 'scheduled')
   const featuredMatch = liveMatch || upcomingMatch
-  const sports = { soccer, basketball }
+
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
