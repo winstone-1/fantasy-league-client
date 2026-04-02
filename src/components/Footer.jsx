@@ -1,5 +1,3 @@
-// src/components/Footer.jsx
-
 import { Link } from 'react-router-dom'
 import { FaTrophy, FaFutbol, FaBasketballBall } from 'react-icons/fa'
 
@@ -8,10 +6,7 @@ const Footer = () => {
     <footer className="border-t border-gray-800 bg-gray-950 mt-auto">
       <div className="max-w-5xl mx-auto px-8 py-10">
 
-        {/* Top row */}
         <div className="flex flex-wrap justify-between items-start gap-8 mb-8">
-
-          {/* Branding */}
           <div>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-green-400 text-xl"><FaTrophy /></span>
@@ -22,14 +17,13 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Nav links */}
           <nav className="flex flex-wrap items-center gap-6">
             {[
-              { label: 'Dashboard',  path: '/' },
-              { label: 'Standings',  path: '/standings' },
-              { label: 'Live',       path: '/livematches' },
-              { label: 'Players',    path: '/search' },
-              { label: 'Profile',    path: '/profile' },
+              { label: 'Dashboard',   path: '/' },
+              { label: 'Standings',   path: '/standings' },
+              { label: 'Live Scores', path: '/livematches' },
+              { label: 'Players',     path: '/search' },
+              { label: 'Profile',     path: '/profile' },
             ].map(({ label, path }) => (
               <Link
                 key={path}
@@ -42,12 +36,10 @@ const Footer = () => {
           </nav>
         </div>
 
-        {/* Bottom row */}
         <div className="border-t border-gray-800 pt-6 flex flex-wrap justify-between items-center gap-4">
           <p className="text-gray-600 text-xs">
             © 2026 FantasyLeague · Built for the capstone 🏆
           </p>
-
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1.5 bg-gray-900 border border-gray-800 rounded-full px-3 py-1 text-xs text-gray-400">
               <FaFutbol className="text-green-400" /> EPL

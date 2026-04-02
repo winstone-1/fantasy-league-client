@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 import api from '../api/axios'
 import { FaFutbol, FaBasketballBall, FaFootballBall, FaTrophy, FaLock, FaEdit, FaCalendarAlt } from 'react-icons/fa'
 
@@ -10,16 +11,16 @@ export default function LeagueDetail() {
   const { user } = useAuth()
   const navigate = useNavigate()
 
-  const [league, setLeague]       = useState(null)
-  const [teams, setTeams]         = useState([])
-  const [standings, setStandings] = useState([])
-  const [matches, setMatches]     = useState([])
-  const [loading, setLoading]     = useState(true)
-  const [activeTab, setActiveTab] = useState('overview')
+  const [league, setLeague]           = useState(null)
+  const [teams, setTeams]             = useState([])
+  const [standings, setStandings]     = useState([])
+  const [matches, setMatches]         = useState([])
+  const [loading, setLoading]         = useState(true)
+  const [activeTab, setActiveTab]     = useState('overview')
   const [showCreateTeam, setShowCreateTeam] = useState(false)
-  const [teamName, setTeamName]   = useState('')
-  const [error, setError]         = useState('')
-  const [success, setSuccess]     = useState('')
+  const [teamName, setTeamName]       = useState('')
+  const [error, setError]             = useState('')
+  const [success, setSuccess]         = useState('')
 
   useEffect(() => { fetchAll() }, [id])
 
@@ -63,7 +64,11 @@ export default function LeagueDetail() {
   const isCommissioner = league?.commissioner?._id === user?._id ||
     league?.commissioner?.email === user?.email
 
-  const sports = { soccer: <FaFutbol />, basketball: <FaBasketballBall />, football: <FaFootballBall /> }
+  const sports = {
+    soccer: <FaFutbol />,
+    basketball: <FaBasketballBall />,
+    football: <FaFootballBall />
+  }
 
   const getRankStyle = (rank) => {
     if (rank === 1) return 'bg-yellow-500 text-white'
@@ -82,9 +87,9 @@ export default function LeagueDetail() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
       <Navbar />
-      <div className="max-w-4xl mx-auto px-8 py-8">
+      <div className="flex-1 max-w-4xl mx-auto w-full px-8 py-8">
 
         {/* Back */}
         <button
@@ -93,6 +98,17 @@ export default function LeagueDetail() {
         >
           ← Back to Leagues
         </button>
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl mb-4 text-sm">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded-xl mb-4 text-sm">
+            {success}
+          </div>
+        )}
 
         {/* League header */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-6">
@@ -108,7 +124,7 @@ export default function LeagueDetail() {
                 </p>
                 <div className="flex items-center gap-2 mt-2">
                   {isCommissioner && (
-                    <span className="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <span className="text-xs bg-green-500/10 text-green-400 border border-green-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
                       <FaEdit className="text-xs" /> Commissioner
                     </span>
                   )}
@@ -122,11 +138,11 @@ export default function LeagueDetail() {
             </div>
 
             <div className="text-right">
-              {/* Commissioner Quick Actions */}
+              {/* Commissioner action — contextual, not in navbar */}
               {isCommissioner && (
                 <button
                   onClick={() => navigate('/commissioner/matches')}
-                  className="mb-2 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2"
+                  className="mb-3 bg-green-500 hover:bg-green-400 text-gray-950 font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2"
                 >
                   <FaCalendarAlt /> Manage Matches
                 </button>
@@ -174,8 +190,8 @@ export default function LeagueDetail() {
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-sm">⚡</div>
                 <div>
-                  <p className="text-sm font-medium text-white">{myTeam.name}</p>
-                  <p className="text-xs text-gray-400">{myTeam.players?.length || 0} players · {myTeam.totalPoints} pts</p>
+                  <p className="text-sm font-semibold text-white">{myTeam.name}</p>
+                  <p className="text-xs text-gray-400">{myTeam.players?.length || 0} players · {myTeam.totalPoints || 0} pts</p>
                 </div>
               </div>
               <button
@@ -188,44 +204,8 @@ export default function LeagueDetail() {
           )}
         </div>
 
-        {/* Commissioner Banner */}
-        {isCommissioner && (
-          <div className="bg-purple-900/20 border border-purple-500/30 rounded-2xl p-4 mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-purple-400 font-semibold flex items-center gap-2">
-                  <FaEdit /> Commissioner Controls
-                </h3>
-                <p className="text-gray-400 text-sm mt-1">
-                  You are the commissioner of this league. Create and manage matches, update live scores.
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => navigate('/commissioner/matches')}
-                  className="bg-purple-600 hover:bg-purple-500 px-5 py-2.5 rounded-xl font-semibold transition flex items-center gap-2 text-sm"
-                >
-                  <FaCalendarAlt /> Schedule & Scores
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Success / Error */}
-        {success && (
-          <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded-xl mb-4 text-sm">
-            ✓ {success}
-          </div>
-        )}
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl mb-4 text-sm">
-            {error}
-          </div>
-        )}
-
         {/* Tabs */}
-        <div className="flex gap-1 bg-gray-900 p-1 rounded-xl border border-gray-800 mb-6">
+        <div className="flex gap-2 bg-gray-900 p-1 rounded-xl border border-gray-800 mb-6">
           {['overview', 'standings', 'matches'].map(tab => (
             <button
               key={tab}
@@ -343,7 +323,7 @@ export default function LeagueDetail() {
               {isCommissioner && (
                 <button
                   onClick={() => navigate('/commissioner/matches')}
-                  className="text-sm bg-purple-600 hover:bg-purple-500 px-3 py-1.5 rounded-lg transition flex items-center gap-1"
+                  className="text-sm bg-green-500 hover:bg-green-400 text-gray-950 font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1"
                 >
                   <FaCalendarAlt className="text-xs" /> Manage
                 </button>
@@ -355,7 +335,7 @@ export default function LeagueDetail() {
                 {isCommissioner && (
                   <button
                     onClick={() => navigate('/commissioner/matches')}
-                    className="mt-4 bg-purple-600 hover:bg-purple-500 px-5 py-2 rounded-xl font-semibold transition text-sm"
+                    className="mt-4 bg-green-500 hover:bg-green-400 text-gray-950 font-bold px-5 py-2 rounded-xl transition text-sm"
                   >
                     Create First Match →
                   </button>
@@ -368,9 +348,11 @@ export default function LeagueDetail() {
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-xs text-gray-500">Week {match.week || 1}</span>
                       <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                        match.status === 'live'      ? 'bg-green-500/20 text-green-400' :
-                        match.status === 'ft' || match.status === 'final' ? 'bg-gray-700 text-gray-400' :
-                        'bg-blue-500/20 text-blue-400'
+                        match.status === 'live'
+                          ? 'bg-green-500/20 text-green-400'
+                          : match.status === 'ft' || match.status === 'final'
+                          ? 'bg-gray-700 text-gray-400'
+                          : 'bg-blue-500/20 text-blue-400'
                       }`}>
                         {match.status === 'live' ? '🔴 LIVE' : match.status === 'ft' || match.status === 'final' ? '✓ Final' : '📅 Scheduled'}
                       </span>
@@ -399,6 +381,7 @@ export default function LeagueDetail() {
         )}
 
       </div>
+      <Footer />
     </div>
   )
 }

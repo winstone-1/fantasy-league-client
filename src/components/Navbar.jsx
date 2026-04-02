@@ -2,39 +2,19 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { FaTrophy } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
-import api from '../api/axios'
 
 function Navbar() {
-  const navigate  = useNavigate()
-  const location  = useLocation()
+  const navigate = useNavigate()
+  const location = useLocation()
   const { user, logout } = useAuth()
-  const [isCommissioner, setIsCommissioner] = useState(false)
-
-  useEffect(() => {
-    const checkCommissionerStatus = async () => {
-      if (user) {
-        try {
-          const res = await api.get('/leagues')
-          const isCommish = res.data.some(league =>
-            league.commissioner?._id === user._id
-          )
-          setIsCommissioner(isCommish)
-        } catch (err) {
-          console.error('Error checking commissioner status:', err)
-        }
-      }
-    }
-    checkCommissionerStatus()
-  }, [user])
 
   const links = [
-    { label: 'Dashboard',   path: '/' },
-    { label: 'My Leagues',  path: '/leagues' },
-    { label: 'Team',     path: '/teams' },
-    { label: 'Players',     path: '/search' },
-    { label: 'Standings',   path: '/standings' },
-    { label: 'Livematches', path: '/livematches' },
+    { label: 'Dashboard',  path: '/' },
+    { label: 'My Leagues', path: '/leagues' },
+    { label: 'My Team',    path: '/teams' },
+    { label: 'Players',    path: '/search' },
+    { label: 'Standings',  path: '/standings' },
+    { label: 'Live Scores', path: '/livematches' },
   ]
 
   const handleLogout = () => {
@@ -67,19 +47,6 @@ function Navbar() {
               {link.label}
             </button>
           ))}
-
-          {isCommissioner && (
-            <button
-              onClick={() => navigate('/commissioner/matches')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                location.pathname === '/commissioner/matches'
-                  ? 'bg-gray-800 text-white'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-               Matches
-            </button>
-          )}
         </div>
 
         {/* User */}

@@ -80,7 +80,7 @@ function Dashboard() {
               {isCommissioner && (
                 <button
                   onClick={() => navigate('/commissioner/matches')}
-                  className="text-sm bg-purple-600 hover:bg-purple-500 border border-purple-500/30 px-4 py-2 rounded-xl text-white flex items-center gap-2 transition"
+                  className="text-sm bg-green-600 hover:bg-green-500 border border-green-500/30 px-4 py-2 rounded-xl text-white flex items-center gap-2 transition"
                 >
                   <FaEdit className="text-xs" /> Manage Matches
                 </button>
@@ -111,10 +111,10 @@ function Dashboard() {
           <>
             {/* Commissioner Banner - Only shows if user is commissioner */}
             {isCommissioner && (
-              <div className="bg-purple-900/20 border border-purple-500/30 rounded-2xl p-4 mb-6">
+              <div className="bg-green-900/20 border border-green-500/30 rounded-2xl p-4 mb-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-purple-400 font-semibold flex items-center gap-2">
+                    <h3 className="text-green-400 font-semibold flex items-center gap-2">
                       <FaEdit /> Commissioner Tools
                     </h3>
                     <p className="text-gray-400 text-sm mt-1">
@@ -123,7 +123,7 @@ function Dashboard() {
                   </div>
                   <button
                     onClick={() => navigate('/commissioner/matches')}
-                    className="bg-purple-600 hover:bg-purple-500 px-5 py-2.5 rounded-xl font-semibold transition flex items-center gap-2"
+                    className="bg-green-600 hover:bg-green-500 px-5 py-2.5 rounded-xl font-semibold transition flex items-center gap-2"
                   >
                     <FaCalendarAlt /> Manage Matches
                   </button>
