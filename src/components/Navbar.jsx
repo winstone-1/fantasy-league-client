@@ -2,22 +2,41 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { FaTrophy } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
-
-
+import { useState, useEffect } from 'react'
+import api from '../api/axios'
 
 function Navbar() {
   const navigate  = useNavigate()
   const location  = useLocation()
   const { user, logout } = useAuth()
+  const [isCommissioner, setIsCommissioner] = useState(false)
+
+  // Check if user is commissioner of any league
+  useEffect(() => {
+    const checkCommissionerStatus = async () => {
+      if (user) {
+        try {
+          const res = await api.get('/leagues')
+          const isCommish = res.data.some(league => 
+            league.commissioner?._id === user._id
+          )
+          setIsCommissioner(isCommish)
+        } catch (err) {
+          console.error('Error checking commissioner status:', err)
+        }
+      }
+    }
+    checkCommissionerStatus()
+  }, [user])
 
   const links = [
-  { label: 'Dashboard', path: '/' },
-  { label: 'My Leagues', path: '/leagues' },
-  { label: 'My Team', path: '/teams' },
-  { label: 'Players', path: '/search' },
-  { label: 'Standings', path: '/standings' },
-  { label: 'Livematches', path: '/livematches' },
-]
+    { label: 'Dashboard', path: '/' },
+    { label: 'My Leagues', path: '/leagues' },
+    { label: 'My Team', path: '/teams' },
+    { label: 'Players', path: '/search' },
+    { label: 'Standings', path: '/standings' },
+    { label: 'Livematches', path: '/livematches' },
+  ]
 
   const handleLogout = () => {
     logout()
@@ -50,16 +69,30 @@ function Navbar() {
             {link.label}
           </button>
         ))}
+        
+        {/* Commissioner Link - Only shows if user is commissioner */}
+        {isCommissioner && (
+          <button
+            onClick={() => navigate('/commissioner/matches')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+              location.pathname === '/commissioner/matches'
+                ? 'bg-purple-600 text-white'
+                : 'text-purple-400 hover:text-purple-300 hover:bg-purple-500/10'
+            }`}
+          >
+            ⚽ Manage Matches
+          </button>
+        )}
       </div>
 
       {/* User */}
       <div className="flex items-center gap-3">
         {user?.photo && (
-          <img src={user.photo} className="w-8 h-8 rounded-full" />
+          <img src={user.photo} className="w-8 h-8 rounded-full" alt="User" />
         )}
         <Link to="/profile" className="text-white hover:text-green-400 transition">
-  {user?.username || user?.email?.split('@')[0]}
-</Link>
+          {user?.username || user?.email?.split('@')[0]}
+        </Link>
         <button
           onClick={handleLogout}
           className="text-sm text-gray-500 hover:text-red-400 transition px-3 py-1.5 rounded-lg hover:bg-red-500/10"

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import api from '../api/axios'
 import Footer from '../components/Footer'
-import { FaTrophy, FaHandSparkles, FaFutbol } from 'react-icons/fa'
+import { FaTrophy, FaHandSparkles, FaFutbol, FaCalendarAlt, FaEdit } from 'react-icons/fa'
 
 function Dashboard() {
   const { user } = useAuth()
@@ -15,6 +15,7 @@ function Dashboard() {
   const [myTeam, setMyTeam]         = useState(null)
   const [topPlayers, setTopPlayers] = useState([])
   const [loading, setLoading]       = useState(true)
+  const [isCommissioner, setIsCommissioner] = useState(false)
 
   useEffect(() => { fetchData() }, [])
 
@@ -24,6 +25,9 @@ function Dashboard() {
       if (leaguesRes.data.length === 0) { setLoading(false); return }
       const firstLeague = leaguesRes.data[0]
       setLeague(firstLeague)
+
+      // Check if user is commissioner of this league
+      setIsCommissioner(firstLeague.commissioner?._id === user?._id)
 
       const [standingsRes, matchesRes] = await Promise.all([
         api.get(`/leagues/${firstLeague._id}/standings`),
@@ -72,9 +76,19 @@ function Dashboard() {
             </p>
           </div>
           {league && (
-            <span className="text-sm bg-gray-900 border border-gray-800 px-4 py-2 rounded-xl text-gray-300 flex items-center gap-1">
-              <FaTrophy /> {league.sport === 'soccer' ? 'Premier League' : 'NBA'}
-            </span>
+            <div className="flex gap-2">
+              {isCommissioner && (
+                <button
+                  onClick={() => navigate('/commissioner/matches')}
+                  className="text-sm bg-purple-600 hover:bg-purple-500 border border-purple-500/30 px-4 py-2 rounded-xl text-white flex items-center gap-2 transition"
+                >
+                  <FaEdit className="text-xs" /> Manage Matches
+                </button>
+              )}
+              <span className="text-sm bg-gray-900 border border-gray-800 px-4 py-2 rounded-xl text-gray-300 flex items-center gap-1">
+                <FaTrophy /> {league.sport === 'soccer' ? 'Premier League' : 'NBA'}
+              </span>
+            </div>
           )}
         </div>
 
@@ -95,6 +109,28 @@ function Dashboard() {
 
         {league && (
           <>
+            {/* Commissioner Banner - Only shows if user is commissioner */}
+            {isCommissioner && (
+              <div className="bg-purple-900/20 border border-purple-500/30 rounded-2xl p-4 mb-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-purple-400 font-semibold flex items-center gap-2">
+                      <FaEdit /> Commissioner Tools
+                    </h3>
+                    <p className="text-gray-400 text-sm mt-1">
+                      You are the commissioner of this league. Manage matches, update scores, and control the schedule.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => navigate('/commissioner/matches')}
+                    className="bg-purple-600 hover:bg-purple-500 px-5 py-2.5 rounded-xl font-semibold transition flex items-center gap-2"
+                  >
+                    <FaCalendarAlt /> Manage Matches
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Live Match Card */}
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-6">
               <div className="flex items-center gap-2 mb-4">
@@ -113,13 +149,17 @@ function Dashboard() {
                 <>
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col items-center gap-3 flex-1">
-                      <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center text-3xl bg-gray-800 ${liveMatch ? 'border-green-500' : 'border-gray-700'}`}></div>
+                      <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center text-3xl bg-gray-800 ${liveMatch ? 'border-green-500' : 'border-gray-700'}`}>
+                        {featuredMatch.homeTeam?.name?.[0] || '?'}
+                      </div>
                       <div className={`text-4xl font-bold ${liveMatch ? 'text-green-400' : 'text-white'}`}>{featuredMatch.homeScore ?? 0}</div>
                       <p className="text-white font-semibold text-center text-sm">{featuredMatch.homeTeam?.name || 'Home Team'}</p>
                     </div>
                     <div className="text-gray-600 text-2xl font-bold px-6">VS</div>
                     <div className="flex flex-col items-center gap-3 flex-1">
-                      <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center text-3xl bg-gray-800 ${liveMatch ? 'border-red-500' : 'border-gray-700'}`}></div>
+                      <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center text-3xl bg-gray-800 ${liveMatch ? 'border-red-500' : 'border-gray-700'}`}>
+                        {featuredMatch.awayTeam?.name?.[0] || '?'}
+                      </div>
                       <div className={`text-4xl font-bold ${liveMatch ? 'text-red-400' : 'text-white'}`}>{featuredMatch.awayScore ?? 0}</div>
                       <p className="text-white font-semibold text-center text-sm">{featuredMatch.awayTeam?.name || 'Away Team'}</p>
                     </div>
@@ -141,7 +181,17 @@ function Dashboard() {
                   )}
                 </>
               ) : (
-                <div className="text-center py-8 text-gray-500">No upcoming matches — commissioner needs to schedule one</div>
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No upcoming matches</p>
+                  {isCommissioner && (
+                    <button
+                      onClick={() => navigate('/commissioner/matches')}
+                      className="mt-3 bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-sm font-semibold transition"
+                    >
+                      Create First Match →
+                    </button>
+                  )}
+                </div>
               )}
             </div>
 
@@ -205,7 +255,7 @@ function Dashboard() {
                 { label: 'My Leagues',      path: '/leagues' },
                 { label: 'Search Players',  path: '/search' },
                 { label: 'Standings',       path: '/standings' },
-                { label: 'Live Matches',    path: '/matches' },
+                { label: 'Live Matches',    path: '/livematches' },
               ].map(action => (
                 <button key={action.path} onClick={() => navigate(action.path)} className="bg-gray-900 border border-gray-800 rounded-2xl p-4 hover:border-green-500 transition text-left">
                   <p className="text-sm font-medium text-white">{action.label}</p>

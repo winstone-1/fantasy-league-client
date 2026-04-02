@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import api from '../api/axios'
-import { FaFutbol, FaBasketballBall, FaFootballBall, FaTrophy, FaLock } from 'react-icons/fa'
+import { FaFutbol, FaBasketballBall, FaFootballBall, FaTrophy, FaLock, FaEdit, FaCalendarAlt } from 'react-icons/fa'
 
 export default function LeagueDetail() {
   const { id } = useParams()
@@ -108,8 +108,8 @@ export default function LeagueDetail() {
                 </p>
                 <div className="flex items-center gap-2 mt-2">
                   {isCommissioner && (
-                    <span className="text-xs bg-green-500/10 text-green-400 border border-green-500/30 px-2 py-0.5 rounded-full">
-                      Commissioner
+                    <span className="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <FaEdit className="text-xs" /> Commissioner
                     </span>
                   )}
                   {league?.isPrivate && (
@@ -122,6 +122,15 @@ export default function LeagueDetail() {
             </div>
 
             <div className="text-right">
+              {/* Commissioner Quick Actions */}
+              {isCommissioner && (
+                <button
+                  onClick={() => navigate('/commissioner/matches')}
+                  className="mb-2 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2"
+                >
+                  <FaCalendarAlt /> Manage Matches
+                </button>
+              )}
               <p className="text-xs text-gray-500 mb-1">Invite Code</p>
               <p className="font-mono text-green-400 text-lg font-bold tracking-widest">
                 {league?.inviteCode}
@@ -178,6 +187,30 @@ export default function LeagueDetail() {
             </div>
           )}
         </div>
+
+        {/* Commissioner Banner */}
+        {isCommissioner && (
+          <div className="bg-purple-900/20 border border-purple-500/30 rounded-2xl p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-purple-400 font-semibold flex items-center gap-2">
+                  <FaEdit /> Commissioner Controls
+                </h3>
+                <p className="text-gray-400 text-sm mt-1">
+                  You are the commissioner of this league. Create and manage matches, update live scores.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => navigate('/commissioner/matches')}
+                  className="bg-purple-600 hover:bg-purple-500 px-5 py-2.5 rounded-xl font-semibold transition flex items-center gap-2 text-sm"
+                >
+                  <FaCalendarAlt /> Schedule & Scores
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Success / Error */}
         {success && (
@@ -305,12 +338,27 @@ export default function LeagueDetail() {
         {/* Matches tab */}
         {activeTab === 'matches' && (
           <div>
-            <h2 className="text-lg font-semibold mb-4">Matches</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Matches</h2>
+              {isCommissioner && (
+                <button
+                  onClick={() => navigate('/commissioner/matches')}
+                  className="text-sm bg-purple-600 hover:bg-purple-500 px-3 py-1.5 rounded-lg transition flex items-center gap-1"
+                >
+                  <FaCalendarAlt className="text-xs" /> Manage
+                </button>
+              )}
+            </div>
             {matches.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                No matches scheduled yet
+              <div className="text-center py-12 bg-gray-900 rounded-2xl border border-gray-800">
+                <p className="text-gray-500">No matches scheduled yet</p>
                 {isCommissioner && (
-                  <p className="text-xs text-gray-600 mt-2">As commissioner you can schedule matches via Postman for now</p>
+                  <button
+                    onClick={() => navigate('/commissioner/matches')}
+                    className="mt-4 bg-purple-600 hover:bg-purple-500 px-5 py-2 rounded-xl font-semibold transition text-sm"
+                  >
+                    Create First Match →
+                  </button>
                 )}
               </div>
             ) : (
@@ -318,24 +366,31 @@ export default function LeagueDetail() {
                 {matches.map(match => (
                   <div key={match._id} className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs text-gray-500">Week {match.week}</span>
+                      <span className="text-xs text-gray-500">Week {match.week || 1}</span>
                       <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                         match.status === 'live'      ? 'bg-green-500/20 text-green-400' :
-                        match.status === 'completed' ? 'bg-gray-700 text-gray-400' :
+                        match.status === 'ft' || match.status === 'final' ? 'bg-gray-700 text-gray-400' :
                         'bg-blue-500/20 text-blue-400'
                       }`}>
-                        {match.status === 'live' ? '🔴 LIVE' : match.status === 'completed' ? '✓ Final' : '📅 Scheduled'}
+                        {match.status === 'live' ? '🔴 LIVE' : match.status === 'ft' || match.status === 'final' ? '✓ Final' : '📅 Scheduled'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <p className="font-semibold text-sm">{match.homeTeam?.name || 'TBD'}</p>
-                      <div className="text-center px-4">
-                        <p className="text-xl font-bold text-white">
-                          {match.homeScore} - {match.awayScore}
-                        </p>
+                      <div className="flex-1 text-left">
+                        <p className="font-semibold text-sm">{match.homeTeam?.name || 'TBD'}</p>
+                        <p className="text-2xl font-bold text-white mt-1">{match.homeScore ?? 0}</p>
                       </div>
-                      <p className="font-semibold text-sm text-right">{match.awayTeam?.name || 'TBD'}</p>
+                      <div className="text-gray-600 text-xl font-bold px-6">VS</div>
+                      <div className="flex-1 text-right">
+                        <p className="font-semibold text-sm">{match.awayTeam?.name || 'TBD'}</p>
+                        <p className="text-2xl font-bold text-white mt-1">{match.awayScore ?? 0}</p>
+                      </div>
                     </div>
+                    {match.minute > 0 && match.status === 'live' && (
+                      <div className="mt-3 text-center">
+                        <span className="text-xs text-yellow-500">{match.minute}'</span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
