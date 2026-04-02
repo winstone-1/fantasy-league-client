@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar'
 import api from '../api/axios'
 import { FaBasketballBall, FaFutbol } from 'react-icons/fa'
 
-// ── Soccer formations ──────────────────────────────────────
+// ── Soccer formations (expanded) ──────────────────────────────────────
 const FORMATIONS = {
   '4-3-3': [
     { id: 'GK',  label: 'GK',  row: 0 },
@@ -33,9 +33,113 @@ const FORMATIONS = {
     { id: 'ST1', label: 'ST',  row: 3 },
     { id: 'ST2', label: 'ST',  row: 3 },
   ],
+  '3-5-2': [
+    { id: 'GK',  label: 'GK',  row: 0 },
+    { id: 'CB1', label: 'CB',  row: 1 },
+    { id: 'CB2', label: 'CB',  row: 1 },
+    { id: 'CB3', label: 'CB',  row: 1 },
+    { id: 'CDM', label: 'CDM', row: 2 },
+    { id: 'LM',  label: 'LM',  row: 2 },
+    { id: 'CM1', label: 'CM',  row: 2 },
+    { id: 'CM2', label: 'CM',  row: 2 },
+    { id: 'RM',  label: 'RM',  row: 2 },
+    { id: 'ST1', label: 'ST',  row: 3 },
+    { id: 'ST2', label: 'ST',  row: 3 },
+  ],
+  '4-2-3-1': [
+    { id: 'GK',   label: 'GK',  row: 0 },
+    { id: 'LB',   label: 'LB',  row: 1 },
+    { id: 'CB1',  label: 'CB',  row: 1 },
+    { id: 'CB2',  label: 'CB',  row: 1 },
+    { id: 'RB',   label: 'RB',  row: 1 },
+    { id: 'CDM1', label: 'CDM', row: 2 },
+    { id: 'CDM2', label: 'CDM', row: 2 },
+    { id: 'CAM',  label: 'CAM', row: 2 },
+    { id: 'LW',   label: 'LW',  row: 3 },
+    { id: 'ST',   label: 'ST',  row: 3 },
+    { id: 'RW',   label: 'RW',  row: 3 },
+  ],
+  '5-3-2': [
+    { id: 'GK',  label: 'GK',  row: 0 },
+    { id: 'LWB', label: 'LWB', row: 1 },
+    { id: 'CB1', label: 'CB',  row: 1 },
+    { id: 'CB2', label: 'CB',  row: 1 },
+    { id: 'CB3', label: 'CB',  row: 1 },
+    { id: 'RWB', label: 'RWB', row: 1 },
+    { id: 'CM1', label: 'CM',  row: 2 },
+    { id: 'CM2', label: 'CM',  row: 2 },
+    { id: 'CM3', label: 'CM',  row: 2 },
+    { id: 'ST1', label: 'ST',  row: 3 },
+    { id: 'ST2', label: 'ST',  row: 3 },
+  ],
+  '3-4-3': [
+    { id: 'GK',  label: 'GK',  row: 0 },
+    { id: 'CB1', label: 'CB',  row: 1 },
+    { id: 'CB2', label: 'CB',  row: 1 },
+    { id: 'CB3', label: 'CB',  row: 1 },
+    { id: 'LM',  label: 'LM',  row: 2 },
+    { id: 'CM1', label: 'CM',  row: 2 },
+    { id: 'CM2', label: 'CM',  row: 2 },
+    { id: 'RM',  label: 'RM',  row: 2 },
+    { id: 'LW',  label: 'LW',  row: 3 },
+    { id: 'ST',  label: 'ST',  row: 3 },
+    { id: 'RW',  label: 'RW',  row: 3 },
+  ],
+  '4-5-1': [
+    { id: 'GK',  label: 'GK',  row: 0 },
+    { id: 'LB',  label: 'LB',  row: 1 },
+    { id: 'CB1', label: 'CB',  row: 1 },
+    { id: 'CB2', label: 'CB',  row: 1 },
+    { id: 'RB',  label: 'RB',  row: 1 },
+    { id: 'CDM', label: 'CDM', row: 2 },
+    { id: 'LM',  label: 'LM',  row: 2 },
+    { id: 'CM1', label: 'CM',  row: 2 },
+    { id: 'CM2', label: 'CM',  row: 2 },
+    { id: 'RM',  label: 'RM',  row: 2 },
+    { id: 'ST',  label: 'ST',  row: 3 },
+  ],
+  '4-1-4-1': [
+    { id: 'GK',  label: 'GK',  row: 0 },
+    { id: 'LB',  label: 'LB',  row: 1 },
+    { id: 'CB1', label: 'CB',  row: 1 },
+    { id: 'CB2', label: 'CB',  row: 1 },
+    { id: 'RB',  label: 'RB',  row: 1 },
+    { id: 'CDM', label: 'CDM', row: 2 },
+    { id: 'LM',  label: 'LM',  row: 2 },
+    { id: 'CM',  label: 'CM',  row: 2 },
+    { id: 'RM',  label: 'RM',  row: 2 },
+    { id: 'CAM', label: 'CAM', row: 3 },
+    { id: 'ST',  label: 'ST',  row: 4 },
+  ],
+  '3-3-3-1': [
+    { id: 'GK',  label: 'GK',  row: 0 },
+    { id: 'CB1', label: 'CB',  row: 1 },
+    { id: 'CB2', label: 'CB',  row: 1 },
+    { id: 'CB3', label: 'CB',  row: 1 },
+    { id: 'CDM', label: 'CDM', row: 2 },
+    { id: 'CM1', label: 'CM',  row: 2 },
+    { id: 'CM2', label: 'CM',  row: 2 },
+    { id: 'LW',  label: 'LW',  row: 3 },
+    { id: 'CAM', label: 'CAM', row: 3 },
+    { id: 'RW',  label: 'RW',  row: 3 },
+    { id: 'ST',  label: 'ST',  row: 4 },
+  ],
+  '5-4-1': [
+    { id: 'GK',  label: 'GK',  row: 0 },
+    { id: 'LWB', label: 'LWB', row: 1 },
+    { id: 'CB1', label: 'CB',  row: 1 },
+    { id: 'CB2', label: 'CB',  row: 1 },
+    { id: 'CB3', label: 'CB',  row: 1 },
+    { id: 'RWB', label: 'RWB', row: 1 },
+    { id: 'LM',  label: 'LM',  row: 2 },
+    { id: 'CM1', label: 'CM',  row: 2 },
+    { id: 'CM2', label: 'CM',  row: 2 },
+    { id: 'RM',  label: 'RM',  row: 2 },
+    { id: 'ST',  label: 'ST',  row: 3 },
+  ],
 }
 
-// ── NBA lineups ────────────────────────────────────────────
+// ── NBA lineups (expanded) ────────────────────────────────────────────
 const NBA_LINEUPS = {
   'Standard': [
     { id: 'NBA_PG', label: 'PG', bench: false },
@@ -57,16 +161,82 @@ const NBA_LINEUPS = {
     { id: 'NBA_B2',  label: 'BN', bench: true  },
     { id: 'NBA_B3',  label: 'BN', bench: true  },
   ],
+  'Big Ball': [
+    { id: 'NBA_PG',  label: 'PG', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_PF1', label: 'PF', bench: false },
+    { id: 'NBA_PF2', label: 'PF', bench: false },
+    { id: 'NBA_C',   label: 'C',  bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+  ],
+  'Three Guards': [
+    { id: 'NBA_PG1', label: 'PG', bench: false },
+    { id: 'NBA_PG2', label: 'PG', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_PF',  label: 'PF', bench: false },
+    { id: 'NBA_C',   label: 'C',  bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+  ],
+  'Shooting Focus': [
+    { id: 'NBA_PG',  label: 'PG', bench: false },
+    { id: 'NBA_SG1', label: 'SG', bench: false },
+    { id: 'NBA_SG2', label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_PF',  label: 'PF', bench: false },
+    { id: 'NBA_C',   label: 'C',  bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+  ],
+  'Defensive': [
+    { id: 'NBA_PG',  label: 'PG', bench: false },
+    { id: 'NBA_SG',  label: 'SG', bench: false },
+    { id: 'NBA_SF',  label: 'SF', bench: false },
+    { id: 'NBA_PF',  label: 'PF', bench: false },
+    { id: 'NBA_C1',  label: 'C',  bench: false },
+    { id: 'NBA_C2',  label: 'C',  bench: false },
+    { id: 'NBA_B1',  label: 'BN', bench: true  },
+    { id: 'NBA_B2',  label: 'BN', bench: true  },
+  ],
+  'Deep Bench': [
+    { id: 'NBA_PG', label: 'PG', bench: false },
+    { id: 'NBA_SG', label: 'SG', bench: false },
+    { id: 'NBA_SF', label: 'SF', bench: false },
+    { id: 'NBA_PF', label: 'PF', bench: false },
+    { id: 'NBA_C',  label: 'C',  bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+    { id: 'NBA_B3', label: 'BN', bench: true  },
+    { id: 'NBA_B4', label: 'BN', bench: true  },
+    { id: 'NBA_B5', label: 'BN', bench: true  },
+  ],
+  'Positionless': [
+    { id: 'NBA_G1', label: 'G', bench: false },
+    { id: 'NBA_G2', label: 'G', bench: false },
+    { id: 'NBA_F1', label: 'F', bench: false },
+    { id: 'NBA_F2', label: 'F', bench: false },
+    { id: 'NBA_F3', label: 'F', bench: false },
+    { id: 'NBA_C',  label: 'C', bench: false },
+    { id: 'NBA_B1', label: 'BN', bench: true  },
+    { id: 'NBA_B2', label: 'BN', bench: true  },
+  ],
 }
 
 // ── Sub-Components ─────────────────────────────────────────
-function PlayerSlot({ position, player, sport, onDragOver, onDrop, onDragStart, onClick }) {
+function PlayerSlot({ position, player, sport, onDragOver, onDrop, onDragStart, onClick, onContextMenu }) {
   return (
     <div
       className="flex flex-col items-center gap-1 cursor-pointer group"
       onDragOver={e => { e.preventDefault(); onDragOver && onDragOver(position) }}
       onDrop={e => { e.preventDefault(); onDrop && onDrop(position) }}
       onClick={() => onClick && onClick(position)}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        onContextMenu && onContextMenu(position);
+      }}
     >
       <div
         draggable={!!player}
@@ -109,16 +279,21 @@ function PlayerSlot({ position, player, sport, onDragOver, onDrop, onDragStart, 
           <span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">{position.label}</span>
         </div>
         {player && (
-          <p className="text-[11px] font-medium text-white mt-1 max-w-[70px] truncate drop-shadow-md">
-            {player?.name?.split(' ').pop() || 'Player'}
-          </p>
+          <>
+            <p className="text-[11px] font-medium text-white mt-1 max-w-[70px] truncate drop-shadow-md">
+              {player?.name?.split(' ').pop() || 'Player'}
+            </p>
+            <p className="text-[9px] text-gray-400 mt-0.5">
+              {player?.position || ''}
+            </p>
+          </>
         )}
       </div>
     </div>
   )
 }
 
-function SoccerPitch({ positions, players, onSlotClick, onDragStart, onDragOver, onDrop }) {
+function SoccerPitch({ positions, players, onSlotClick, onDragStart, onDragOver, onDrop, onRemovePlayer }) {
   const rows = [...new Set(positions.map(p => p.row))].sort((a, b) => b - a)
   return (
     <div className="relative w-full rounded-3xl overflow-hidden bg-green-900 border-4 border-white/10 shadow-2xl" style={{ minHeight: '520px', background: 'linear-gradient(180deg, #14532d 0%, #166534 50%, #14532d 100%)' }}>
@@ -132,7 +307,17 @@ function SoccerPitch({ positions, players, onSlotClick, onDragStart, onDragOver,
         {rows.map(row => (
           <div key={row} className="flex justify-around items-center px-4">
             {positions.filter(p => p.row === row).map(pos => (
-              <PlayerSlot key={pos.id} position={pos} player={players[pos.id]} sport="soccer" onClick={onSlotClick} onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop} />
+              <PlayerSlot 
+                key={pos.id} 
+                position={pos} 
+                player={players[pos.id]} 
+                sport="soccer" 
+                onClick={onSlotClick} 
+                onDragStart={onDragStart} 
+                onDragOver={onDragOver} 
+                onDrop={onDrop}
+                onContextMenu={onRemovePlayer}
+              />
             ))}
           </div>
         ))}
@@ -141,7 +326,7 @@ function SoccerPitch({ positions, players, onSlotClick, onDragStart, onDragOver,
   )
 }
 
-function NBACourt({ positions, players, onSlotClick, onDragStart, onDragOver, onDrop }) {
+function NBACourt({ positions, players, onSlotClick, onDragStart, onDragOver, onDrop, onRemovePlayer }) {
   const starters = positions.filter(p => !p.bench)
   const bench = positions.filter(p => p.bench)
   return (
@@ -151,9 +336,19 @@ function NBACourt({ positions, players, onSlotClick, onDragStart, onDragOver, on
            <div className="absolute top-0 left-0 bottom-0 w-1/2 border-r-2 border-white" />
            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 border-2 border-white rounded-full" />
         </div>
-        <div className="relative z-10 flex justify-around items-center h-full">
+        <div className="relative z-10 flex justify-around items-center h-full flex-wrap gap-4">
           {starters.map(pos => (
-            <PlayerSlot key={pos.id} position={pos} player={players[pos.id]} sport="basketball" onClick={onSlotClick} onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop} />
+            <PlayerSlot 
+              key={pos.id} 
+              position={pos} 
+              player={players[pos.id]} 
+              sport="basketball" 
+              onClick={onSlotClick} 
+              onDragStart={onDragStart} 
+              onDragOver={onDragOver} 
+              onDrop={onDrop}
+              onContextMenu={onRemovePlayer}
+            />
           ))}
         </div>
       </div>
@@ -161,7 +356,17 @@ function NBACourt({ positions, players, onSlotClick, onDragStart, onDragOver, on
         <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 text-center">Interchange / Bench</p>
         <div className="flex gap-6 justify-center flex-wrap">
           {bench.map(pos => (
-            <PlayerSlot key={pos.id} position={pos} player={players[pos.id]} sport="basketball" onClick={onSlotClick} onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop} />
+            <PlayerSlot 
+              key={pos.id} 
+              position={pos} 
+              player={players[pos.id]} 
+              sport="basketball" 
+              onClick={onSlotClick} 
+              onDragStart={onDragStart} 
+              onDragOver={onDragOver} 
+              onDrop={onDrop}
+              onContextMenu={onRemovePlayer}
+            />
           ))}
         </div>
       </div>
@@ -198,7 +403,6 @@ export default function Teams() {
       setLoading(true)
       const leaguesRes = await api.get('/leagues');
       
-      // Reset states
       let soccerTeamFound = null
       let nbaTeamFound = null
       let soccerPlayersMap = {}
@@ -211,11 +415,9 @@ export default function Teams() {
 
           if (myTeam) {
             const mapped = {};
-            // Properly map players from the saved roster
             if (myTeam.players && Array.isArray(myTeam.players)) {
               myTeam.players.forEach(item => {
                 if (item.position && item.player) {
-                  // Handle both populated and unpopulated player data
                   mapped[item.position] = item.player._id ? item.player : item.player;
                 }
               });
@@ -262,7 +464,6 @@ export default function Teams() {
         name: `${user.username || 'My'} ${sport === 'soccer' ? 'FC' : 'Squad'}`
       })
 
-      // Create empty roster structure
       const positions = sport === 'soccer' ? FORMATIONS[soccerFormation] : NBA_LINEUPS[nbaLineup]
       const emptyRoster = positions.reduce((acc, pos) => {
         acc[pos.id] = null
@@ -277,7 +478,7 @@ export default function Teams() {
         setNbaPlayers(emptyRoster)
       }
 
-      await fetchTeams() // Refresh to get the full team data
+      await fetchTeams()
     } catch (err) {
       console.error('Create team error:', err)
       alert(err.response?.data?.message || "Failed to create team.")
@@ -307,7 +508,7 @@ export default function Teams() {
   };
 
   const removePlayer = (pos) => {
-    if (window.confirm('Remove this player from the roster?')) {
+    if (window.confirm(`Remove ${pos.label} from the roster?`)) {
       const setter = sport === 'soccer' ? setSoccerPlayers : setNbaPlayers;
       setter(prev => ({
         ...prev,
@@ -325,7 +526,6 @@ export default function Teams() {
       return;
     }
 
-    // Filter out null/undefined players and prepare roster
     const roster = Object.entries(currentPlayers)
       .filter(([_, player]) => player && player._id)
       .map(([slotId, player]) => ({
@@ -344,7 +544,6 @@ export default function Teams() {
         players: roster
       });
       
-      // Refresh team data after save to ensure consistency
       await fetchTeams();
       alert("Team saved successfully!");
     } catch (err) {
@@ -355,14 +554,46 @@ export default function Teams() {
     }
   };
 
+  const handleFormationChange = (formation) => {
+    if (sport === 'soccer') {
+      // Preserve existing players that match position IDs
+      const newPositions = FORMATIONS[formation]
+      const currentPlayersMap = { ...soccerPlayers }
+      const newPlayersMap = {}
+      
+      newPositions.forEach(pos => {
+        // Try to keep existing player if position ID exists in old formation
+        if (currentPlayersMap[pos.id]) {
+          newPlayersMap[pos.id] = currentPlayersMap[pos.id]
+        } else {
+          newPlayersMap[pos.id] = null
+        }
+      })
+      
+      setSoccerPlayers(newPlayersMap)
+      setSoccerFormation(formation)
+    } else {
+      const newPositions = NBA_LINEUPS[formation]
+      const currentPlayersMap = { ...nbaPlayers }
+      const newPlayersMap = {}
+      
+      newPositions.forEach(pos => {
+        if (currentPlayersMap[pos.id]) {
+          newPlayersMap[pos.id] = currentPlayersMap[pos.id]
+        } else {
+          newPlayersMap[pos.id] = null
+        }
+      })
+      
+      setNbaPlayers(newPlayersMap)
+      setNbaLineup(formation)
+    }
+  }
+
   const handleDragStart = (pos, player) => {
     if (player) {
       setDragSource({ pos, player })
     }
-  }
-  
-  const handleDragOver = (pos) => {
-    // Optional: Add visual feedback
   }
   
   const handleDrop = (targetPos) => {
@@ -378,7 +609,6 @@ export default function Teams() {
       const targetPlayer = next[targetPos.id]
       const sourcePlayer = next[dragSource.pos.id]
       
-      // Swap players
       next[targetPos.id] = sourcePlayer
       next[dragSource.pos.id] = targetPlayer || null
       
@@ -392,24 +622,17 @@ export default function Teams() {
   const positions = sport === 'soccer' ? FORMATIONS[soccerFormation] : NBA_LINEUPS[nbaLineup]
   const playersCount = Object.keys(currentPlayers).filter(k => currentPlayers[k] && currentPlayers[k]._id).length;
 
-  // Debug log to see what's being loaded
-  useEffect(() => {
-    if (currentTeam) {
-      console.log(`Loaded ${sport} team:`, currentTeam.name)
-      console.log(`Players:`, currentPlayers)
-    }
-  }, [currentTeam, currentPlayers, sport])
-
   return (
     <div className="min-h-screen bg-gray-950 text-white pb-32 selection:bg-green-500/30">
       <Navbar />
-      <div className="max-w-4xl mx-auto px-6 py-10">
+      <div className="max-w-6xl mx-auto px-6 py-10">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
           <div>
             <h1 className="text-4xl font-black tracking-tight mb-1">Squad Management</h1>
             <p className="text-gray-500 font-medium italic">Configure your {sport} lineup for the next matchday.</p>
+            <p className="text-xs text-gray-600 mt-2">💡 Right-click on a player to remove them</p>
           </div>
           <div className="flex p-1.5 bg-gray-900/80 backdrop-blur border border-gray-800 rounded-2xl shadow-inner">
             <button 
@@ -443,12 +666,12 @@ export default function Teams() {
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Control Bar */}
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex gap-2 p-1 bg-gray-900/50 rounded-xl border border-gray-800">
+              <div className="flex flex-wrap gap-2 p-1 bg-gray-900/50 rounded-xl border border-gray-800">
                 {(sport === 'soccer' ? Object.keys(FORMATIONS) : Object.keys(NBA_LINEUPS)).map(f => (
                   <button 
                     key={f} 
-                    onClick={() => sport === 'soccer' ? setSoccerFormation(f) : setNbaLineup(f)} 
-                    className={`px-4 py-1.5 rounded-lg text-xs font-bold transition ${ (sport === 'soccer' ? soccerFormation : nbaLineup) === f ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
+                    onClick={() => handleFormationChange(f)} 
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap ${ (sport === 'soccer' ? soccerFormation : nbaLineup) === f ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
                   >
                     {f}
                   </button>
@@ -470,6 +693,15 @@ export default function Teams() {
               </div>
             </div>
 
+            {/* Formation Info */}
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 text-center">
+              <p className="text-xs text-blue-400">
+                🏆 Current Formation: <span className="font-bold">{sport === 'soccer' ? soccerFormation : nbaLineup}</span>
+                {sport === 'soccer' && ` • ${positions.length} Players on Field`}
+                {sport === 'basketball' && ` • ${positions.filter(p => !p.bench).length} Starters + ${positions.filter(p => p.bench).length} Bench`}
+              </p>
+            </div>
+
             {/* Field/Pitch Component */}
             <div className="relative">
               {sport === 'soccer' ? (
@@ -478,8 +710,9 @@ export default function Teams() {
                   players={currentPlayers} 
                   onSlotClick={openPicker} 
                   onDragStart={handleDragStart} 
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop} 
+                  onDragOver={() => {}} 
+                  onDrop={handleDrop}
+                  onRemovePlayer={removePlayer}
                 />
               ) : (
                 <NBACourt 
@@ -487,8 +720,9 @@ export default function Teams() {
                   players={currentPlayers} 
                   onSlotClick={openPicker} 
                   onDragStart={handleDragStart} 
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop} 
+                  onDragOver={() => {}} 
+                  onDrop={handleDrop}
+                  onRemovePlayer={removePlayer}
                 />
               )}
               
@@ -504,8 +738,8 @@ export default function Teams() {
                    </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] text-gray-500 italic">Changes auto-saved on "Save"</p>
-                  <p className="text-xs font-medium text-gray-300">Click save to persist changes</p>
+                  <p className="text-[10px] text-gray-500 italic">Drag players to swap positions</p>
+                  <p className="text-[10px] text-gray-500">Right-click to remove player</p>
                 </div>
               </div>
             </div>
@@ -542,7 +776,8 @@ export default function Teams() {
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-black text-white group-hover:text-green-400 transition-colors">{p.name}</p>
-                          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">{p.team} · {p.position}</p>
+                          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">{p.team || 'Free Agent'} · {p.position}</p>
+                          {p.rating && <p className="text-[9px] text-yellow-500">⭐ {p.rating}</p>}
                         </div>
                         <div className="h-8 w-8 rounded-full border border-white/10 flex items-center justify-center text-green-500 opacity-0 group-hover:opacity-100 transition-all">
                           +
