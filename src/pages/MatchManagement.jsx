@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import api from '../api/axios'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { FaFutbol, FaBasketballBall, FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaPlay, FaStop, FaClock } from 'react-icons/fa'
+import { FaFutbol, FaBasketballBall, FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaPlay, FaStop, FaClock, FaMapMarkerAlt } from 'react-icons/fa'
 
 export default function MatchManagement() {
   const { user } = useAuth()
@@ -339,8 +339,8 @@ export default function MatchManagement() {
 
                   {/* Venue */}
                   {match.venue && (
-                    <p className="text-sm text-gray-500 text-center mb-4">
-                      📍 {match.venue}
+                    <p className="text-sm text-gray-500 text-center mb-4 flex items-center justify-center gap-1">
+                      <FaMapMarkerAlt /> {match.venue}
                     </p>
                   )}
 
