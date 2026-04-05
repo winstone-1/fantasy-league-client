@@ -38,7 +38,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 pt-6 flex flex-wrap justify-between items-center gap-4">
           <p className="text-gray-600 text-xs">
-            © 2026 FantasyLeague · Built for the capstone 🏆
+            © 2026 FantasyLeague · Built for the capstone 
           </p>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1.5 bg-gray-900 border border-gray-800 rounded-full px-3 py-1 text-xs text-gray-400">
