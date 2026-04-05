@@ -1,4 +1,3 @@
-
 // With lazy loading, each page only downloads when the user navigates to it.
 // This cuts your initial load by ~60-70%.
 
@@ -10,18 +9,18 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 // ── Lazy-loaded pages ─────────────────────────────────────────────────────────
 // Each page becomes a separate JS chunk that loads on-demand.
 
-const Dashboard      = lazy(() => import('./pages/Dashboard'))
-const League         = lazy(() => import('./pages/League'))
-const LeagueDetail   = lazy(() => import('./pages/LeagueDetail'))
-const Teams          = lazy(() => import('./pages/Teams'))
-const Search         = lazy(() => import('./pages/Search'))
-const Standings      = lazy(() => import('./pages/Standings'))
-const LiveMatches    = lazy(() => import('./pages/Livematches'))
-const UserProfile    = lazy(() => import('./pages/userProfile'))
-const MatchManagement = lazy(() => import('./pages/MatchManagement'))
-const Login          = lazy(() => import('./pages/Login'))
-const Register       = lazy(() => import('./pages/Register'))
-const NotFound       = lazy(() => import('./pages/NotFound'))
+const Dashboard           = lazy(() => import('./pages/Dashboard'))
+const League              = lazy(() => import('./pages/League'))
+const LeagueDetail        = lazy(() => import('./pages/LeagueDetail'))
+const Teams               = lazy(() => import('./pages/Teams'))
+const Search              = lazy(() => import('./pages/Search'))
+const Standings           = lazy(() => import('./pages/Standings'))
+const LiveMatches         = lazy(() => import('./pages/Livematches'))
+const UserProfile         = lazy(() => import('./pages/userProfile'))
+const CommissionerMatches = lazy(() => import('./pages/Commissionermatches'))
+const Login               = lazy(() => import('./pages/Login'))
+const Register            = lazy(() => import('./pages/Register'))
+const NotFound            = lazy(() => import('./pages/NotFound'))
 
 // ── Page loader ───────────────────────────────────────────────────────────────
 // Shown while a page chunk is downloading. Keep it minimal — it's usually
@@ -53,7 +52,7 @@ function CommissionerRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <PageLoader />
   if (!user) return <Navigate to="/login" replace />
-  // Commission check happens inside MatchManagement itself,
+  // Commission check happens inside CommissionerMatches itself,
   // but this at least ensures the user is authenticated first.
   return children
 }
@@ -95,7 +94,7 @@ function AppRoutes() {
           <ProtectedRoute><UserProfile /></ProtectedRoute>
         } />
         <Route path="/commissioner/matches" element={
-          <CommissionerRoute><MatchManagement /></CommissionerRoute>
+          <CommissionerRoute><CommissionerMatches /></CommissionerRoute>
         } />
 
         {/* 404 */}
