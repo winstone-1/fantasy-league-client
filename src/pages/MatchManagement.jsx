@@ -1,14 +1,67 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../api/axios'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import { FaFutbol, FaBasketballBall, FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaPlay, FaMapMarkerAlt } from 'react-icons/fa'
+import {
+  FaFutbol, FaBasketballBall, FaPlus, FaEdit, FaTrash,
+  FaSave, FaTimes, FaPlay, FaMapMarkerAlt,
+  FaCheckCircle, FaExclamationCircle, FaInfoCircle
+} from 'react-icons/fa'
 
+/* ─── Toast System ──────────────────────────────────────────── */
+function Toast({ toasts, removeToast }) {
+  return (
+    <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
+      {toasts.map(t => (
+        <div
+          key={t.id}
+          className={`
+            flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium
+            pointer-events-auto animate-slide-in max-w-xs
+            ${t.type === 'success' ? 'bg-green-600 text-white' : ''}
+            ${t.type === 'error'   ? 'bg-red-600 text-white'   : ''}
+            ${t.type === 'info'    ? 'bg-gray-700 text-white'  : ''}
+          `}
+        >
+          <span className="mt-0.5 shrink-0">
+            {t.type === 'success' && <FaCheckCircle />}
+            {t.type === 'error'   && <FaExclamationCircle />}
+            {t.type === 'info'    && <FaInfoCircle />}
+          </span>
+          <span className="flex-1">{t.message}</span>
+          <button onClick={() => removeToast(t.id)} className="ml-1 opacity-70 hover:opacity-100">
+            <FaTimes className="text-xs" />
+          </button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function useToast() {
+  const [toasts, setToasts] = useState([])
+
+  const addToast = useCallback((message, type = 'info') => {
+    const id = Date.now()
+    setToasts(prev => [...prev, { id, message, type }])
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000)
+  }, [])
+
+  const removeToast = useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }, [])
+
+  return { toasts, removeToast, success: m => addToast(m, 'success'), error: m => addToast(m, 'error'), info: m => addToast(m, 'info') }
+}
+
+/* ─── Main Component ────────────────────────────────────────── */
 export default function MatchManagement() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const toast = useToast()
+
   const [leagues, setLeagues] = useState([])
   const [selectedLeague, setSelectedLeague] = useState(null)
   const [matches, setMatches] = useState([])
@@ -16,8 +69,11 @@ export default function MatchManagement() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [showScoreModal, setShowScoreModal] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null) // matchId
   const [editingMatch, setEditingMatch] = useState(null)
   const [selectedMatchForScore, setSelectedMatchForScore] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+
   const [formData, setFormData] = useState({
     homeTeam: '', awayTeam: '', date: '', time: '',
     week: 1, venue: '', status: 'scheduled'
@@ -30,25 +86,39 @@ export default function MatchManagement() {
     try {
       const res = await api.get('/leagues')
       const userLeagues = res.data.filter(league => league.commissioner?._id === user?._id)
-      if (userLeagues.length === 0) { alert('You are not a commissioner of any league'); navigate('/leagues'); return }
+      if (userLeagues.length === 0) {
+        toast.info('You are not a commissioner of any league')
+        navigate('/leagues')
+        return
+      }
       setLeagues(userLeagues)
       setSelectedLeague(userLeagues[0])
       await fetchTeams(userLeagues[0]._id)
       await fetchMatches(userLeagues[0]._id)
-      setLoading(false)
     } catch (err) {
-      console.error(err); alert('Error loading leagues'); setLoading(false)
+      console.error(err)
+      toast.error('Error loading leagues')
+    } finally {
+      setLoading(false)
     }
   }
 
   const fetchTeams = async (leagueId) => {
-    try { const res = await api.get(`/leagues/${leagueId}/teams`); setTeams(res.data) }
-    catch (err) { console.error('Error fetching teams:', err) }
+    try {
+      const res = await api.get(`/leagues/${leagueId}/teams`)
+      setTeams(res.data)
+    } catch (err) {
+      console.error('Error fetching teams:', err)
+    }
   }
 
   const fetchMatches = async (leagueId) => {
-    try { const res = await api.get(`/leagues/${leagueId}/matches`); setMatches(res.data) }
-    catch (err) { console.error('Error fetching matches:', err) }
+    try {
+      const res = await api.get(`/leagues/${leagueId}/matches`)
+      setMatches(res.data)
+    } catch (err) {
+      console.error('Error fetching matches:', err)
+    }
   }
 
   const handleLeagueChange = async (leagueId) => {
@@ -60,7 +130,11 @@ export default function MatchManagement() {
 
   const handleCreateMatch = () => {
     setEditingMatch(null)
-    setFormData({ homeTeam: '', awayTeam: '', date: new Date().toISOString().split('T')[0], time: '19:00', week: 1, venue: '', status: 'scheduled' })
+    setFormData({
+      homeTeam: '', awayTeam: '',
+      date: new Date().toISOString().split('T')[0],
+      time: '19:00', week: 1, venue: '', status: 'scheduled'
+    })
     setShowModal(true)
   }
 
@@ -70,59 +144,100 @@ export default function MatchManagement() {
       homeTeam: match.homeTeam._id || match.homeTeam,
       awayTeam: match.awayTeam._id || match.awayTeam,
       date: match.date?.split('T')[0] || new Date().toISOString().split('T')[0],
-      time: match.time || '19:00', week: match.week || 1,
-      venue: match.venue || '', status: match.status || 'scheduled'
+      time: match.time || '19:00',
+      week: match.week || 1,
+      venue: match.venue || '',
+      status: match.status || 'scheduled'
     })
     setShowModal(true)
   }
 
   const handleDeleteMatch = async (matchId) => {
-    if (!window.confirm('Are you sure you want to delete this match?')) return
     try {
       await api.delete(`/leagues/${selectedLeague._id}/matches/${matchId}`)
+      setShowDeleteConfirm(null)
       await fetchMatches(selectedLeague._id)
-      alert('Match deleted successfully')
-    } catch (err) { console.error(err); alert('Error deleting match') }
+      toast.success('Match deleted')
+    } catch (err) {
+      console.error(err)
+      toast.error(err.response?.data?.message || 'Error deleting match')
+    }
   }
 
   const handleSubmitMatch = async (e) => {
     e.preventDefault()
-    if (!formData.homeTeam || !formData.awayTeam) { alert('Please select both teams'); return }
-    if (formData.homeTeam === formData.awayTeam) { alert('Cannot schedule a match with the same team'); return }
+    if (!formData.homeTeam || !formData.awayTeam) {
+      toast.error('Please select both teams')
+      return
+    }
+    if (formData.homeTeam === formData.awayTeam) {
+      toast.error('Home and away teams must be different')
+      return
+    }
+    setSubmitting(true)
     const startTime = new Date(`${formData.date}T${formData.time}:00`).toISOString()
     const matchData = { ...formData, startTime, week: Number(formData.week) }
     try {
       if (editingMatch) {
         await api.put(`/leagues/${selectedLeague._id}/matches/${editingMatch._id}`, matchData)
-        alert('Match updated successfully')
+        toast.success('Match updated')
       } else {
         await api.post(`/leagues/${selectedLeague._id}/matches`, matchData)
-        alert('Match created successfully')
+        toast.success('Match created')
       }
       setShowModal(false)
       await fetchMatches(selectedLeague._id)
-    } catch (err) { console.error(err); alert(err.response?.data?.message || 'Error saving match') }
+    } catch (err) {
+      console.error(err)
+      toast.error(err.response?.data?.message || 'Error saving match')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handleUpdateScore = async (e) => {
     e.preventDefault()
+    setSubmitting(true)
     try {
-      await api.put(`/matches/${selectedMatchForScore._id}/score`, scoreData)
+      // Update score
+      await api.put(`/matches/${selectedMatchForScore._id}/score`, {
+        homeScore: scoreData.homeScore,
+        awayScore: scoreData.awayScore,
+        minute: scoreData.minute
+      })
+      // Auto-set to live if not already
       if (selectedMatchForScore.status !== 'live') {
-        await api.patch(`/matches/${selectedMatchForScore._id}/status`, { status: 'live', minute: scoreData.minute })
+        await api.patch(`/matches/${selectedMatchForScore._id}/status`, {
+          status: 'live',
+          minute: scoreData.minute
+        })
       }
-      alert('Score updated successfully')
+      toast.success('Score updated')
       setShowScoreModal(false)
       await fetchMatches(selectedLeague._id)
-    } catch (err) { console.error('Error updating score:', err); alert('Error updating score') }
+    } catch (err) {
+      console.error('Error updating score:', err)
+      toast.error(err.response?.data?.message || 'Error updating score')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
-  const handleMatchStatus = async (matchId, status, minute = null) => {
+  // ── KEY FIX: status sent as plain string in body, never appended to URL ──
+  const handleMatchStatus = async (matchId, newStatus, minute = null) => {
     try {
-      await api.patch(`/matches/${matchId}/status`, { status, minute })
+      const body = { status: newStatus }
+      if (minute !== null) body.minute = Number(minute)
+
+      await api.patch(`/matches/${matchId}/status`, body)
       await fetchMatches(selectedLeague._id)
-      alert(`Match marked as ${status}`)
-    } catch (err) { console.error('Error updating status:', err); alert('Error updating status') }
+
+      const labels = { live: 'Match started', ht: 'Half time', ft: 'Full time — match ended', cancelled: 'Match cancelled' }
+      toast.success(labels[newStatus] || `Status set to ${newStatus}`)
+    } catch (err) {
+      console.error('Error updating status:', err)
+      toast.error(err.response?.data?.message || 'Error updating match status')
+    }
   }
 
   const openScoreModal = (match) => {
@@ -132,10 +247,17 @@ export default function MatchManagement() {
   }
 
   const getStatusBadge = (status) => {
-    const statuses = { scheduled: 'bg-gray-600', live: 'bg-green-500 animate-pulse', ht: 'bg-yellow-600', ft: 'bg-blue-600', cancelled: 'bg-red-600' }
-    return statuses[status] || 'bg-gray-600'
+    const map = {
+      scheduled: 'bg-gray-600',
+      live: 'bg-green-500 animate-pulse',
+      ht: 'bg-yellow-600',
+      ft: 'bg-blue-600',
+      cancelled: 'bg-red-600'
+    }
+    return map[status] || 'bg-gray-600'
   }
 
+  /* ── Loading ── */
   if (loading) return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
@@ -148,11 +270,14 @@ export default function MatchManagement() {
     </div>
   )
 
+  /* ── Render ── */
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
+      <Toast toasts={toast.toasts} removeToast={toast.removeToast} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6 sm:mb-8">
           <div>
@@ -196,6 +321,8 @@ export default function MatchManagement() {
             matches.map(match => (
               <div key={match._id} className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
                 <div className="p-4 sm:p-5">
+
+                  {/* Status row */}
                   <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                     <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                       <span className="text-xl sm:text-2xl">
@@ -212,6 +339,7 @@ export default function MatchManagement() {
                     </div>
                   </div>
 
+                  {/* Score row */}
                   <div className="flex items-center justify-between mb-4 sm:mb-6">
                     <div className="flex-1 text-center">
                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -236,7 +364,7 @@ export default function MatchManagement() {
                     </p>
                   )}
 
-                  {/* Action buttons — scrollable on mobile */}
+                  {/* Action buttons */}
                   <div className="flex gap-2 justify-end border-t border-gray-800 pt-4 flex-wrap">
                     {match.status === 'scheduled' && (
                       <button
@@ -262,6 +390,14 @@ export default function MatchManagement() {
                         </button>
                       </>
                     )}
+                    {match.status === 'ht' && (
+                      <button
+                        onClick={() => handleMatchStatus(match._id, 'live', match.minute)}
+                        className="px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5"
+                      >
+                        <FaPlay className="text-xs" /> 2nd Half
+                      </button>
+                    )}
                     <button
                       onClick={() => openScoreModal(match)}
                       className="px-3 sm:px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5"
@@ -275,7 +411,7 @@ export default function MatchManagement() {
                       <FaEdit />
                     </button>
                     <button
-                      onClick={() => handleDeleteMatch(match._id)}
+                      onClick={() => setShowDeleteConfirm(match._id)}
                       className="px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-xs sm:text-sm font-semibold"
                     >
                       <FaTrash />
@@ -288,7 +424,31 @@ export default function MatchManagement() {
         </div>
       </div>
 
-      {/* Create/Edit Match Modal */}
+      {/* ── Delete Confirm Modal ── */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-bold mb-2">Delete Match?</h3>
+            <p className="text-gray-400 text-sm mb-6">This action cannot be undone.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(null)}
+                className="flex-1 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-sm font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteMatch(showDeleteConfirm)}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-sm font-semibold"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Create/Edit Match Modal ── */}
       {showModal && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
           <div className="bg-gray-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-6 max-h-[90vh] overflow-y-auto">
@@ -343,15 +503,16 @@ export default function MatchManagement() {
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm"
                   placeholder="Stadium name" />
               </div>
-              <button type="submit" className="w-full bg-green-600 hover:bg-green-500 py-3 rounded-xl font-semibold mt-2">
-                {editingMatch ? 'Update Match' : 'Create Match'}
+              <button type="submit" disabled={submitting}
+                className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-50 py-3 rounded-xl font-semibold mt-2">
+                {submitting ? 'Saving...' : editingMatch ? 'Update Match' : 'Create Match'}
               </button>
             </form>
           </div>
         </div>
       )}
 
-      {/* Update Score Modal */}
+      {/* ── Update Score Modal ── */}
       {showScoreModal && selectedMatchForScore && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
           <div className="bg-gray-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-6">
@@ -382,13 +543,14 @@ export default function MatchManagement() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Minute (live matches)</label>
+                <label className="block text-sm text-gray-400 mb-1">Minute</label>
                 <input type="number" min="0" max="120" value={scoreData.minute}
                   onChange={(e) => setScoreData({...scoreData, minute: parseInt(e.target.value)})}
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm" />
               </div>
-              <button type="submit" className="w-full bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-semibold">
-                Update Score
+              <button type="submit" disabled={submitting}
+                className="w-full bg-purple-600 hover:bg-purple-500 disabled:opacity-50 py-3 rounded-xl font-semibold">
+                {submitting ? 'Updating...' : 'Update Score'}
               </button>
             </form>
           </div>
