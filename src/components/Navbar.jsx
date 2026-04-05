@@ -29,10 +29,26 @@ function Navbar() {
     setMenuOpen(false)
   }
 
+  // Generate initials avatar from email or username
+  const getInitial = () => {
+    const name = user?.username || user?.email || '?'
+    return name[0].toUpperCase()
+  }
+
+  const Avatar = ({ size = 'w-8 h-8', textSize = 'text-sm' }) => (
+    user?.photo
+      ? <img src={user.photo} className={`${size} rounded-full object-cover border border-gray-700`} alt="User" />
+      : (
+        <div className={`${size} rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center text-green-400 font-bold ${textSize} shrink-0`}>
+          {getInitial()}
+        </div>
+      )
+  )
+
   return (
     <>
       <nav className="border-b border-gray-800 bg-gray-950 sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between gap-4">
 
           {/* Logo */}
           <div
@@ -43,8 +59,8 @@ function Navbar() {
             <span className="text-green-400 font-bold text-lg">FantasyLeague</span>
           </div>
 
-          {/* Desktop links */}
-          <div className="hidden lg:flex items-center gap-1">
+          {/* Desktop links — centered */}
+          <div className="hidden lg:flex items-center gap-1 flex-1 justify-center">
             {links.map(link => (
               <button
                 key={link.path}
@@ -60,20 +76,17 @@ function Navbar() {
             ))}
           </div>
 
-          {/* Desktop user */}
-          <div className="hidden lg:flex items-center gap-3">
-            {user?.photo && (
-              <img src={user.photo} className="w-8 h-8 rounded-full" alt="User" />
-            )}
-            <Link
-              to="/profile"
-              className="text-white hover:text-green-400 transition text-sm"
-            >
-              {user?.username || user?.email?.split('@')[0]}
+          {/* Desktop user — pinned far right */}
+          <div className="hidden lg:flex items-center gap-3 shrink-0 border-l border-gray-800 pl-4 ml-2">
+            <Link to="/profile" className="flex items-center gap-2.5 hover:opacity-80 transition">
+              <Avatar />
+              <span className="text-white text-sm font-medium">
+                {user?.username || user?.email?.split('@')[0]}
+              </span>
             </Link>
             <button
               onClick={handleLogout}
-              className="text-sm text-gray-500 hover:text-red-400 transition px-3 py-1.5 rounded-lg hover:bg-red-500/10"
+              className="text-sm text-gray-500 hover:text-red-400 transition px-3 py-1.5 rounded-lg hover:bg-red-500/10 border border-transparent hover:border-red-500/20"
             >
               Logout
             </button>
@@ -81,9 +94,7 @@ function Navbar() {
 
           {/* Mobile right side — avatar + hamburger */}
           <div className="flex lg:hidden items-center gap-3">
-            {user?.photo && (
-              <img src={user.photo} className="w-8 h-8 rounded-full" alt="User" />
-            )}
+            <Avatar />
             <button
               onClick={() => setMenuOpen(prev => !prev)}
               className="text-gray-400 hover:text-white transition p-1"
@@ -99,15 +110,12 @@ function Navbar() {
       {/* Mobile drawer */}
       {menuOpen && (
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black/60 z-40 lg:hidden"
             onClick={() => setMenuOpen(false)}
           />
 
-          {/* Slide-in panel */}
-          <div className="fixed top-0 right-0 h-full w-72 bg-gray-950 border-l border-gray-800 z-50 lg:hidden flex flex-col shadow-2xl
-            animate-in slide-in-from-right duration-200">
+          <div className="fixed top-0 right-0 h-full w-72 bg-gray-950 border-l border-gray-800 z-50 lg:hidden flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
 
             {/* Drawer header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
@@ -115,10 +123,7 @@ function Navbar() {
                 <span className="text-green-400"><FaTrophy /></span>
                 <span className="text-green-400 font-bold">FantasyLeague</span>
               </div>
-              <button
-                onClick={() => setMenuOpen(false)}
-                className="text-gray-400 hover:text-white transition p-1"
-              >
+              <button onClick={() => setMenuOpen(false)} className="text-gray-400 hover:text-white transition p-1">
                 <FaTimes size={18} />
               </button>
             </div>
@@ -126,14 +131,7 @@ function Navbar() {
             {/* User info */}
             <div className="px-5 py-4 border-b border-gray-800">
               <div className="flex items-center gap-3">
-                {user?.photo
-                  ? <img src={user.photo} className="w-10 h-10 rounded-full" alt="User" />
-                  : (
-                    <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 font-bold text-sm">
-                      {(user?.username || user?.email || '?')[0].toUpperCase()}
-                    </div>
-                  )
-                }
+                <Avatar size="w-10 h-10" textSize="text-base" />
                 <div>
                   <p className="text-white font-semibold text-sm">
                     {user?.username || user?.email?.split('@')[0]}
