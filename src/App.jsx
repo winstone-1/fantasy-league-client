@@ -1,14 +1,11 @@
-// src/App.jsx — Code splitting with React.lazy + Suspense
-//
-// WHAT THIS FIXES:
-// Right now your app bundles every page into one JS file. A user visiting
-// /login has to download the code for Teams, Standings, LiveMatches, etc.
+
 // With lazy loading, each page only downloads when the user navigates to it.
 // This cuts your initial load by ~60-70%.
 
 import { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+
 
 // ── Lazy-loaded pages ─────────────────────────────────────────────────────────
 // Each page becomes a separate JS chunk that loads on-demand.
