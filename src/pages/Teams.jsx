@@ -534,14 +534,37 @@ export default function Teams() {
     }
   }
 
-  const assignPlayer = (pos, player) => {
-    if (sport === 'soccer') {
-      setSoccerPlayers(prev => ({ ...prev, [pos.id]: player }))
-    } else {
-      setNbaPlayers(prev => ({ ...prev, [pos.id]: player }))
-    }
+  const assignPlayer = async (pos, player) => {
+    const updatedSoccer = sport === 'soccer' ? { ...soccerPlayers, [pos.id]: player } : soccerPlayers
+    const updatedNba    = sport === 'basketball' ? { ...nbaPlayers, [pos.id]: player } : nbaPlayers
+
+    if (sport === 'soccer') setSoccerPlayers(updatedSoccer)
+    else setNbaPlayers(updatedNba)
+
     setSelectedSlot(null)
     setShowManualAdd(false)
+
+    // Auto-save to backend
+    const currentTeam = sport === 'soccer' ? soccerTeam : nbaTeam
+    if (!currentTeam) return
+
+    const currentPlayers = sport === 'soccer' ? updatedSoccer : updatedNba
+    const roster = Object.entries(currentPlayers)
+      .filter(([_, p]) => p && p._id)
+      .map(([slotId, p]) => {
+        const entry = { position: slotId, player: p._id }
+        if (sport === 'soccer' && soccerCoords[slotId]) {
+          entry.x = soccerCoords[slotId].x
+          entry.y = soccerCoords[slotId].y
+        }
+        return entry
+      })
+
+    try {
+      await api.put(`/leagues/${currentTeam.leagueId}/teams/${currentTeam._id}`, { players: roster })
+    } catch (err) {
+      console.error('Auto-save failed:', err)
+    }
   }
 
   const removePlayer = (pos) => {

@@ -42,6 +42,53 @@ function Search() {
     }
   }
 
+  const handleAddToTeam = async (player, team) => {
+    setAdding(player._id)
+    setShowPicker(null)
+    try {
+      const teamRes = await api.get(`/leagues/${team.leagueId}/teams`)
+      const fullTeam = teamRes.data.find(t => t._id === team._id)
+      const existingRoster = fullTeam?.players || []
+
+      const alreadyAdded = existingRoster.some(
+        entry => entry.player?._id === player._id || entry.player === player._id
+      )
+      if (alreadyAdded) {
+        setSuccessMsg(`${player.name} is already on ${team.name}!`)
+        setTimeout(() => setSuccessMsg(''), 3000)
+        return
+      }
+
+      const formation = team.sport === 'soccer'
+        ? ['GK','LB','CB1','CB2','RB','CM1','CM2','CM3','LW','ST','RW']
+        : ['NBA_PG','NBA_SG','NBA_SF','NBA_PF','NBA_C','NBA_B1','NBA_B2','NBA_B3']
+
+      const usedSlots = new Set(existingRoster.map(e => e.position))
+      const emptySlot = formation.find(slot => !usedSlots.has(slot))
+
+      if (!emptySlot) {
+        setSuccessMsg(`${team.name} roster is full!`)
+        setTimeout(() => setSuccessMsg(''), 3000)
+        return
+      }
+
+      const updatedRoster = [
+        ...existingRoster.map(e => ({ position: e.position, player: e.player?._id || e.player })),
+        { position: emptySlot, player: player._id }
+      ]
+
+      await api.put(`/leagues/${team.leagueId}/teams/${team._id}`, { players: updatedRoster })
+      setSuccessMsg(`${player.name} added to ${team.name}!`)
+      setTimeout(() => setSuccessMsg(''), 3000)
+    } catch (err) {
+      console.error('Add to team error:', err)
+      setSuccessMsg('Failed to add player. Try again.')
+      setTimeout(() => setSuccessMsg(''), 3000)
+    } finally {
+      setAdding(null)
+    }
+  }
+
   const handleSearch = async (e) => {
     e.preventDefault()
     if (!query.trim()) return
