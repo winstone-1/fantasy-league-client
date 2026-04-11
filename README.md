@@ -125,13 +125,13 @@ npm run dev
 ![Standings](src/assets/Standings.png)
 
 ### Live Matches
-![Live Matches](src/assets/Livematches.png)
+![Live Matches](src/assets/Livescores.png)
 
 ### Player Search
-![Player Search](src/assets/Search.png)
+![Player Search](src/assets/Search1.png)
 
 ### User Profile
-![User Profile](src/assets/userProfile.png.)
+![User Profile](src/assets/Profile.png)
 
 ---
 
