@@ -23,12 +23,13 @@ const getTrend = (currentRank, previousRank) => {
   return { icon: '↓', color: 'text-red-400' }
 }
 
-const enrichEntry = (entry, idx, allEntries) => {
-  const wins        = entry.wins         ?? entry.w         ?? 0
-  const losses      = entry.losses       ?? entry.l         ?? 0
-  const draws       = entry.draws        ?? entry.d         ?? 0
-  const weeklyPoints = entry.weeklyPoints ?? entry.gw        ?? null
-  return { ...entry, wins, losses, draws, weeklyPoints }
+const enrichEntry = (entry) => {
+  const wins         = entry.wins         ?? 0
+  const losses       = entry.losses       ?? 0
+  const draws        = entry.draws        ?? 0
+  const weeklyPoints = entry.weeklyPoints ?? null
+  const name         = entry.name         ?? entry.teamName ?? 'Unknown'
+  return { ...entry, name, wins, losses, draws, weeklyPoints }
 }
 
 // ─── Skeleton row ───────────────────────────────────────────────────────────
@@ -89,7 +90,7 @@ function Standings() {
       raw.forEach(e => { currentRanks[e.teamId] = e.rank })
       localStorage.setItem(storageKey, JSON.stringify(currentRanks))
 
-      setStandings(raw.map((e, i, arr) => enrichEntry(e, i, arr)))
+      setStandings(raw.map(e => enrichEntry(e)))
       setError('')
     } catch {
       setError('Failed to load standings')
@@ -197,9 +198,10 @@ function Standings() {
             {/* Rows */}
             <div className="space-y-3">
               {standings.map((entry) => {
-                const badge  = getRankBadge(entry.rank)
-                const trend  = getTrend(entry.rank, prevRanks[entry.teamId])
-                const isMe   = entry.owner?._id === user?._id || entry.owner?.email === user?.email
+                const badge = getRankBadge(entry.rank)
+                const trend = getTrend(entry.rank, prevRanks[entry.teamId])
+                const isMe  = entry.owner?.toString() === user?._id?.toString()
+                           || entry.owner === user?._id
 
                 return (
                   <div
